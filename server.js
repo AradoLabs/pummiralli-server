@@ -20,6 +20,10 @@ function connectionHandler(socket) {
         const response = await testHandler(data);
         socket.write(response);
         return;
+      case JOIN:
+        const response = await joinHandler(data);
+        socket.write(response);
+        return;
     }
   });
 }
