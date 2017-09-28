@@ -1,0 +1,16 @@
+{
+  "presets": [
+    [
+      "es2015",
+      "stage0"
+    ]
+  ],
+  "plugins": [
+    "transform-class-properties",
+    "transform-export-extensions",
+    "transform-flow-strip-types",
+    "transform-object-rest-spread",
+    "transform-async-to-generator"
+  ],
+  "retainLines": true
+}
