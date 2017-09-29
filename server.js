@@ -1,6 +1,7 @@
 import jot from 'json-over-tcp';
 import testHandler from './handlers/test';
-import { TEST_TYPE } from './messageTypes';
+import joinHandler from './handlers/join';
+import { TEST_TYPE, JOIN } from './messageTypes';
 
 const PORT = 8099;
 
@@ -21,8 +22,7 @@ function connectionHandler(socket) {
         socket.write(response);
         return;
       case JOIN:
-        const response = await joinHandler(data);
-        socket.write(response);
+        socket.write(await joinHandler(data));
         return;
     }
   });

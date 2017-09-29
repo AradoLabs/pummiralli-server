@@ -1,5 +1,5 @@
 import jot from 'json-over-tcp';
-import { TEST_TYPE } from '../messageTypes';
+import { TEST_TYPE, JOIN } from '../messageTypes';
 
 const PORT = 8099;
 
@@ -8,12 +8,17 @@ const testMessage = {
   name: 'test kikkula',
 };
 
+const joinMessage = {
+  messageType: JOIN,
+  name: 'test kikkula',
+};
+
 // Creates one connection to the server when the server starts listening
 function createConnection() {
   // Start a connection to the server
   var socket = jot.connect(PORT, function() {
     // Send the initial message once connected
-    socket.write(testMessage);
+    socket.write(joinMessage);
   });
 
   // Whenever the server sends us an object...
