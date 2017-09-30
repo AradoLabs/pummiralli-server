@@ -1,16 +1,16 @@
-import jot from 'json-over-tcp';
-import { TEST_TYPE, JOIN } from '../messageTypes';
+import jot from "json-over-tcp";
+import { TEST_TYPE, JOIN } from "../messageTypes";
 
 const PORT = 8099;
 
 const testMessage = {
   messageType: TEST_TYPE,
-  name: 'test kikkula',
+  name: "test kikkula",
 };
 
 const joinMessage = {
   messageType: JOIN,
-  name: 'test kikkula',
+  name: "test kikkula",
 };
 
 // Creates one connection to the server when the server starts listening
@@ -22,7 +22,7 @@ function createConnection() {
   });
 
   // Whenever the server sends us an object...
-  socket.on('data', function(data) {
+  socket.on("data", function(data) {
     // Output the answer property of the server's message to the console
     console.log("Server's answer: " + JSON.stringify(data));
 

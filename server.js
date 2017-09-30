@@ -1,37 +1,39 @@
 import jot from "json-over-tcp";
 import testHandler from "./handlers/test";
 import joinHandler from "./handlers/join";
-import { TEST_TYPE, JOIN } from "./messageTypes";
+import MessageType from "./data/messageType";
+import Pummiralli from "./domain/pummiralli";
 
 const PORT = 8099;
+const ralli = new Pummiralli();
 
-var server = jot.createServer({});
-server.on("connection", connectionHandler);
-
-// Triggered whenever something connects to the server
-function connectionHandler(socket) {
+const connectionHandler = socket => {
   // Whenever a connection sends us an object...
-  socket.on("data", async data => {
-    if (!data.messageType) {
+  socket.on("data", async message => {
+    if (!message.messageType) {
       socket.write("Invalid or empty messageType");
     }
-    let whoBeTheBot = null;
-    console.log("data.messageType: " + data.messageType);
-    switch (data.messageType) {
-      case TEST_TYPE:
-        const response = await testHandler(data);
-        socket.write(response);
-        return;
-      case JOIN:
-        whoBeTheBot = data.bot;
-        socket.write(await joinHandler(data));
-        return;
-      case MOVE:
-        socket.write(await moveHandler(whoBeTheBot, data));
-        return;
+    console.log(`received data.messageType: ${message.messageType}`);
+    let bot;
+    switch (message.messageType) {
+      case MessageType.join: {
+        bot = {
+          name: message.data.name,
+          connection: socket,
+        };
+        ralli.join(bot);
+        socket.write(message);
+        break;
+      }
+      case MessageType.move:
+        bot.handleMove(message.data);
+        socket.write(`moving ${bot.name} to ${message.data.angle}`);
+        break;
     }
   });
-}
+};
 
-// Start listening
+// Let's go
+const server = jot.createServer({});
+server.on("connection", connectionHandler);
 server.listen(PORT);

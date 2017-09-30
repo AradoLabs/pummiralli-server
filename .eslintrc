@@ -5,18 +5,15 @@
     "browser": true
   },
   "rules": {
+    "indent": 0,
+    "no-console": 0,
     "no-magic-numbers": 0,
-    "comma-dangle": [
-      2,
-      "always-multiline"
-    ],
-    "jsx-quotes": [
-      2,
-      "prefer-double"
-    ],
+    "arrow-parens": 0,
+    "comma-dangle": [2, "always-multiline"],
+    "jsx-quotes": [2, "prefer-double"],
     "quotes": [
       2,
-      "single",
+      "double",
       {
         "allowTemplateLiterals": true
       }

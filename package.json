@@ -28,6 +28,7 @@
     "eslint-plugin-flowtype": "^2.36.0",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-prettier": "^2.3.1",
+    "eslint-plugin-react": "^7.4.0",
     "prettier": "^1.7.1",
     "yarn": "^1.1.0"
   }

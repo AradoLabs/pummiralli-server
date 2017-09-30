@@ -1,9 +1,11 @@
-import db from "./db";
-
 export default class Pummiralli {
-  constructor(props) {
-    super(props);
+  constructor() {
+    this.events = [];
     this.bots = [];
+  }
+
+  collectEvent(event) {
+    this.events.push(event);
   }
 
   join(bot) {
