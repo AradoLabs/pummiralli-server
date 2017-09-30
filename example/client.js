@@ -1,37 +1,37 @@
 import jot from "json-over-tcp";
-import { TEST_TYPE, JOIN } from "../messageTypes";
+import MessageType from "../data/messageType";
 
 const PORT = 8099;
 
-const testMessage = {
-  messageType: TEST_TYPE,
-  name: "test kikkula",
+const moveMessage = {
+  messageType: MessageType.move,
+  data: { angle: Math.PI / 4 },
 };
 
 const joinMessage = {
-  messageType: JOIN,
-  name: "test kikkula",
+  messageType: MessageType.join,
+  data: { name: "test kikkula" },
 };
 
-// Creates one connection to the server when the server starts listening
-function createConnection() {
-  // Start a connection to the server
-  var socket = jot.connect(PORT, function() {
+const createConnection = function () {
+  const socket = jot.connect(PORT, () => {
     // Send the initial message once connected
+    console.log(`Sending ${JSON.stringify(joinMessage)}`);
     socket.write(joinMessage);
   });
 
-  // Whenever the server sends us an object...
-  socket.on("data", function(data) {
-    // Output the answer property of the server's message to the console
-    console.log("Server's answer: " + JSON.stringify(data));
+  socket.on("data", data => {
+    if (data.messageType === MessageType.gameStart) {
+      socket.write(moveMessage);
+    }
+    console.log(`Server's answer: ${JSON.stringify(data)}`);
 
     // Wait one second, then write a question to the socket
-    setTimeout(function() {
+    setTimeout(() => {
       // Notice that we "write" a JSON object to the socket
-      socket.write(testMessage);
+      socket.write(moveMessage);
     }, 1000);
   });
-}
+};
 
 createConnection();

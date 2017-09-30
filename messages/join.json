@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "additionalProperties": false,
+  "definitions": {},
+  "id": "http://example.com/example.json",
+  "properties": {
+    "data": {
+      "additionalProperties": false,
+      "id": "/properties/data",
+      "properties": {
+        "name": {
+          "default": "",
+          "description": "An explanation about the purpose of this instance.",
+          "id": "/properties/data/properties/name",
+          "title": "The name schema",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "messageType": {
+      "default": "",
+      "description": "An explanation about the purpose of this instance.",
+      "id": "/properties/messageType",
+      "title": "The messagetype schema",
+      "type": "string",
+      "enum": [
+        "JOIN"
+      ]
+    }
+  },
+  "required": [
+    "messageType",
+    "data"
+  ],
+  "type": "object"
+}
