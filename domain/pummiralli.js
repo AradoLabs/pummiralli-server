@@ -1,14 +1,21 @@
+// @flow
+import type { Message } from "../domain/message";
+import Bot from "../domain/bot";
+
 export default class Pummiralli {
+  messages: Array<Message>;
+  bots: Array<Bot>;
   constructor() {
-    this.events = [];
+    this.messages = [];
     this.bots = [];
   }
 
-  collectEvent(event) {
-    this.events.push(event);
+  // for debug purposes
+  collectMessage(message: Message) {
+    this.messages.push(message);
   }
 
-  join(bot) {
+  join(bot: Bot) {
     this.bots.push(bot);
   }
 

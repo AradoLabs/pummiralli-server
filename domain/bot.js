@@ -1,10 +1,24 @@
+// @flow
+import type { Message, MoveMessageData } from "../domain/message";
+
 export default class Bot {
-  constructor(name, connection) {
+  name: string;
+  socket: any;
+  moves: ?Array<MoveMessageData>;
+
+  constructor(name: string, socket: any) {
     this.name = name;
-    this.connection = connection;
+    this.socket = socket;
   }
 
-  sendMessage(message) {
-    this.connection.write(message);
+  handleMove(messageData: MoveMessageData) {
+    if (!this.moves) {
+      this.moves = [];
+    }
+    this.moves.push(messageData);
+  }
+
+  sendMessage(message: Message) {
+    this.socket.write(message);
   }
 }

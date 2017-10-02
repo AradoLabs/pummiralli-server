@@ -1,11 +1,13 @@
+// @flow
 import jot from "json-over-tcp";
 import Ajv from "ajv";
 import schema from "./messages/schema.json";
-import MessageType from "./data/messageType";
+
+import { MessageType } from "./domain/message";
 import Pummiralli from "./domain/pummiralli";
+import Bot from "./domain/bot";
 
 const validateMessage = new Ajv().compile(schema);
-
 const PORT = 8099;
 const ralli = new Pummiralli();
 
@@ -14,34 +16,31 @@ const connectionHandler = socket => {
   socket.on("data", async message => {
     if (!validateMessage(message)) {
       socket.write(
-        `Invalid message: ${JSON.stringify(validateMessage.errors)}`
+        `Invalid message: ${JSON.stringify(validateMessage.errors)}`,
       );
+      return;
     }
+    ralli.collectMessage(message);
 
     // TODO: How do we identify bots - address? pass around some id?
     const address = socket.address().address;
     let bot;
     switch (message.messageType) {
       case MessageType.join: {
-        bot = {
-          name: message.data.name,
-          connection: socket,
-        };
+        bot = new Bot(message.data.name, socket);
         ralli.join(bot);
         socket.write(message);
         break;
       }
       case MessageType.move:
-        // TODO: Movement: bot moves I guess but data needs to go to ralli.
-        // How should this work?
-        ralli.collectEvent({
-          type: "move",
-          bot: address,
+        if (!bot) {
+          socket.write("Cannot move before joining!");
+          return;
+        }
+        bot.handleMove({
           angle: message.data.angle,
         });
-        //bot.handleMove(message.data);
         socket.write(`moving bot from '${address}' to ${message.data.angle}`);
-
         break;
     }
   });

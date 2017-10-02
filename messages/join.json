@@ -3,6 +3,7 @@
   "additionalProperties": false,
   "definitions": {},
   "id": "http://example.com/example.json",
+  "name": "Join",
   "properties": {
     "data": {
       "additionalProperties": false,
@@ -16,9 +17,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "name"
-      ],
+      "required": ["name"],
       "type": "object"
     },
     "messageType": {
@@ -27,14 +26,9 @@
       "id": "/properties/messageType",
       "title": "The messagetype schema",
       "type": "string",
-      "enum": [
-        "JOIN"
-      ]
+      "enum": ["JOIN"]
     }
   },
-  "required": [
-    "messageType",
-    "data"
-  ],
+  "required": ["messageType", "data"],
   "type": "object"
 }
