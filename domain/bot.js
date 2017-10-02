@@ -1,5 +1,5 @@
 // @flow
-import type { Message, MoveMessageData } from "../domain/message";
+import type { Message, MoveMessageData } from "../domain/messages";
 
 export default class Bot {
   name: string;

@@ -2,8 +2,8 @@
   "name": "pummiralli-server",
   "main": "server.js",
   "scripts": {
-    "start": "babel-node --presets es2015 server.js",
-    "test-client": "babel-node --presets es2015 example/client.js"
+    "start": "babel-node --presets es2015,stage-0 server.js",
+    "test-client": "babel-node --presets es2015,stage-0 example/client.js"
   },
   "dependencies": {
     "ajv": "^5.2.3",

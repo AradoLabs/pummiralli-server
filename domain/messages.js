@@ -25,7 +25,7 @@ export type MoveMessage = {
 };
 
 export type GameStartMessageData = {
-  field: Array<number>,
+  field: any,
 };
 
 export type GameStartMessage = {

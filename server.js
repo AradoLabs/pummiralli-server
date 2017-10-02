@@ -3,7 +3,7 @@ import jot from "json-over-tcp";
 import Ajv from "ajv";
 import schema from "./messages/schema.json";
 
-import { MessageType } from "./domain/message";
+import { MessageType } from "./domain/messages";
 import Pummiralli from "./domain/pummiralli";
 import Bot from "./domain/bot";
 
@@ -13,6 +13,7 @@ const ralli = new Pummiralli();
 
 const connectionHandler = socket => {
   // Whenever a connection sends us an object...
+  let bot;
   socket.on("data", async message => {
     if (!validateMessage(message)) {
       socket.write(
@@ -24,7 +25,6 @@ const connectionHandler = socket => {
 
     // TODO: How do we identify bots - address? pass around some id?
     const address = socket.address().address;
-    let bot;
     switch (message.messageType) {
       case MessageType.join: {
         bot = new Bot(message.data.name, socket);
@@ -50,3 +50,8 @@ const connectionHandler = socket => {
 const server = jot.createServer({});
 server.on("connection", connectionHandler);
 server.listen(PORT);
+
+setTimeout(() => {
+  console.log("starting pummiralli!");
+  ralli.start();
+}, 5000);

@@ -1,5 +1,5 @@
 // @flow
-import type { Message } from "../domain/message";
+import type { Message, GameStartMessage } from "../domain/messages";
 import Bot from "../domain/bot";
 
 export default class Pummiralli {
@@ -19,7 +19,14 @@ export default class Pummiralli {
     this.bots.push(bot);
   }
 
-  generateStartMessage() {}
+  generateStartMessage(): GameStartMessage {
+    return {
+      messageType: "gameStart",
+      data: {
+        field: {},
+      },
+    };
+  }
 
   start() {
     const gameStartMessage = this.generateStartMessage();
