@@ -7,7 +7,7 @@ const PORT = 8099;
 
 const moveMessage = {
   messageType: "move",
-  data: { angle: Math.PI / 4 },
+  data: { angle: Math.PI },
 };
 
 const joinMessage = {
