@@ -34,3 +34,8 @@ export type GameStartMessage = {
 };
 
 export type Message = JoinMessage | MoveMessage | GameStartMessage;
+
+export type TickMessage = {
+  tick: number,
+  message: Message,
+};

@@ -5,7 +5,6 @@ import Position from "./position";
 export default class Bot {
   name: string;
   socket: any;
-  moves: ?Array<MoveMessageData>;
   position: Position;
 
   constructor(name: string, socket: any) {
@@ -14,7 +13,7 @@ export default class Bot {
     this.position = new Position(0, 0); // Tää pitäs olla kartan alkupiste a.k.a K-piste
   }
 
-  handleMove(messageData: MoveMessageData) {
+  handle(messageData: MoveMessageData) {
     if (!this.moves) {
       this.moves = [];
     }
@@ -29,7 +28,9 @@ export default class Bot {
     if (this.moves.length > 0) {
       this.position.updatePosition(this.moves[0].angle, distance);
       this.moves = []; // Tartteeks botin tietää vanhoja moveja?
-      console.log(`Bot '${this.name}' moved to (${this.position.x}, ${this.position.y})s`);
+      console.log(
+        `Bot '${this.name}' moved to (${this.position.x}, ${this.position.y})s`,
+      );
       // Pitäs lähettää clientille uus sijainti
     }
   }
