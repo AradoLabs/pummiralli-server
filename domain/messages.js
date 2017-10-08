@@ -1,9 +1,12 @@
 // @flow
+import type Position from "./position";
 
 export const MessageType = {
   join: "join",
   move: "move",
   gameStart: "gameStart",
+  gameEnd: "gameEnd",
+  playerPositions: "playerPositions",
 };
 
 export type JoinMessageData = {
@@ -33,9 +36,34 @@ export type GameStartMessage = {
   data: GameStartMessageData,
 };
 
-export type Message = JoinMessage | MoveMessage | GameStartMessage;
+export type GameEndMessageData = {
+  winner: any,
+};
 
-export type TickMessage = {
+export type GameEndMessage = {
+  messageType: "gameEnd",
+  data: GameEndMessageData,
+};
+
+export type PlayerPositionMessageData = {
+  name: string,
+  position: Position,
+};
+
+export type PlayerPositionsMessage = {
+  messageType: "playerPositions",
+  data: Array<PlayerPositionMessageData>,
+};
+
+export type Message =
+  | JoinMessage
+  | MoveMessage
+  | GameStartMessage
+  | GameEndMessage
+  | PlayerPositionsMessage;
+
+export type ClientMessage = {
   tick: number,
   message: Message,
+  socket: any,
 };

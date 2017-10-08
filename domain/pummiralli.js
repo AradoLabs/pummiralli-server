@@ -2,26 +2,38 @@
 import type {
   Message,
   GameStartMessage,
-  TickMessage,
+  GameEndMessage,
+  PlayerPositionsMessage,
+  ClientMessage,
 } from "../domain/messages";
+import { MessageType } from "../domain/messages";
 import Bot from "../domain/bot";
 
+const GAME_START_DELAY = 10000;
+const TICK_INTERVAL = 1000;
+
 export default class Pummiralli {
-  allEvents: Array<TickMessage>;
-  eventsReceivedDuringTick: Array<TickMessage>;
+  eventsReceived: Array<ClientMessage>;
+  eventHistory: Array<ClientMessage>;
   bots: Array<Bot>;
   tickInterval: any;
   currentGameTick: number;
 
   constructor() {
-    this.allEvents = [];
-    this.eventsReceivedDuringTick = [];
+    this.eventsReceived = [];
+    this.eventHistory = [];
     this.bots = [];
+    this.currentGameTick = 0;
   }
 
-  collectMessage(message: Message) {
-    this.eventsReceivedDuringTick.push({
+  collectMessage(socket: any, message: Message) {
+    const client = socket.address();
+    console.log(
+      `received '${message.messageType}' from ${client.address}:${client.port}`,
+    );
+    this.eventsReceived.push({
       tick: this.currentGameTick,
+      socket,
       message,
     });
   }
@@ -32,20 +44,50 @@ export default class Pummiralli {
 
   generateStartMessage(): GameStartMessage {
     return {
-      messageType: "gameStart",
+      messageType: MessageType.gameStart,
       data: {
         field: {},
       },
     };
   }
 
+  generateEndMessage(): GameEndMessage {
+    return {
+      messageType: MessageType.gameEnd,
+      data: {
+        winner: {},
+      },
+    };
+  }
+
+  generatePlayerPositionsMessage(): PlayerPositionsMessage {
+    return {
+      messageType: MessageType.playerPositions,
+      data: this.bots.map(bot => bot.getCurrentPosition()),
+    };
+  }
+
   start() {
-    const gameStartMessage = this.generateStartMessage();
-    this.bots.map(bot => bot.sendMessage(gameStartMessage));
     this.tickInterval = setInterval(() => {
-      console.log("wait for clients!");
       this.tick();
-    }, 500);
+      console.log(
+        `tick ${this.currentGameTick} - waiting for ${TICK_INTERVAL}ms`,
+      );
+    }, TICK_INTERVAL);
+    console.log(
+      `Pummiralli starting in ${GAME_START_DELAY}ms - waiting for bots..`,
+    );
+    setTimeout(() => {
+      if (this.bots.length === 0) {
+        console.log("no bots connected!");
+        clearInterval(this.tickInterval);
+        return;
+      }
+      console.log("generating start message");
+      const gameStartMessage = this.generateStartMessage();
+      console.log(`sending start message to ${this.bots.length} bots`);
+      this.bots.map(bot => bot.sendMessage(gameStartMessage));
+    }, GAME_START_DELAY);
   }
 
   end() {
@@ -54,9 +96,44 @@ export default class Pummiralli {
     this.bots.map(bot => bot.sendMessage(gameEndMessage));
   }
 
+  processEventsReceivedDuringTick() {
+    this.eventsReceived.forEach(event => {
+      const message = event.message;
+      console.log(
+        `processing event received during tick (type: ${message.messageType})`,
+      );
+      switch (message.messageType) {
+        case MessageType.join: {
+          const bot = new Bot(message.data.name, event.socket);
+          this.join(bot);
+          // for now just send the same join message back
+          bot.sendMessage(message);
+          break;
+        }
+        case MessageType.move: {
+          const bot = this.bots.find(b => b.socket === event.socket);
+          if (!bot) {
+            event.socket.write("could not find joined bot!");
+            break;
+          }
+          bot.handleMove({
+            angle: message.data.angle,
+          });
+          break;
+        }
+      }
+      this.eventHistory.push(event);
+    });
+    if (this.eventsReceived.length > 0) {
+      console.log(`${this.eventHistory.length} events in history`);
+    }
+    this.eventsReceived.length = 0;
+  }
+
   tick() {
-    // Oletus: v = 5 min/km, tick = 5s
-    //  => yhdellä tickillä etenee 16.65m
-    this.bots.map(bot => bot.move(16.65));
+    this.processEventsReceivedDuringTick();
+    this.currentGameTick++;
+    const playerPositionsMessage = this.generatePlayerPositionsMessage();
+    this.bots.map(bot => bot.sendMessage(playerPositionsMessage));
   }
 }

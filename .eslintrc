@@ -11,12 +11,8 @@
     "arrow-parens": 0,
     "comma-dangle": [2, "always-multiline"],
     "jsx-quotes": [2, "prefer-double"],
-    "quotes": [
-      2,
-      "double",
-      {
-        "allowTemplateLiterals": true
-      }
-    ]
+    "prefer-template": 1,
+    "template-curly-spacing": ["error", "never"],
+    "quotes": [2, "double", { "allowTemplateLiterals": true }]
   }
 }
