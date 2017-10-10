@@ -1,13 +1,14 @@
 // @flow
 import type {
   Message,
-  GameStartMessage,
-  GameEndMessage,
-  PlayerPositionsMessage,
-  ClientMessage,
+    GameStartMessage,
+    GameEndMessage,
+    PlayerPositionsMessage,
+    ClientMessage,
 } from "../domain/messages";
 import { MessageType } from "../domain/messages";
 import Bot from "../domain/bot";
+import Position from "./position";
 
 const GAME_START_DELAY = 10000;
 const TICK_INTERVAL = 1000;
@@ -46,7 +47,8 @@ export default class Pummiralli {
     return {
       messageType: MessageType.gameStart,
       data: {
-        field: {},
+        start: new Position(0, 0),
+        goal: new Position(4900, 4900),
       },
     };
   }
