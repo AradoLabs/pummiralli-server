@@ -4,10 +4,17 @@ import jot from "json-over-tcp";
 import { MessageType } from "../domain/messages";
 
 const PORT = 8099;
+let current;
+let target;
 
-const moveMessage = {
-  messageType: "move",
-  data: { angle: Math.PI },
+const moveMessage = () => {
+  console.log(`target: ${JSON.stringify(target)}`);
+  console.log(`current: ${JSON.stringify(current)}`);
+  const atan = Math.atan((target.x - current.x) / Math.sqrt((target.y - current.y) ** 2 + 1e-12));
+  return {
+    messageType: "move",
+    data: { angle: (target.y - current.y) < 0 ? Math.PI - atan : atan },
+  };
 };
 
 const joinMessage = {
@@ -22,11 +29,13 @@ const createConnection = () => {
     socket.write(joinMessage);
   });
 
-  socket.on("data", data => {
-    console.log(`server says: ${JSON.stringify(data)}`);
-    if (data.messageType === MessageType.gameStart) {
-      console.log(`I sends: ${JSON.stringify(moveMessage)}`);
-      socket.write(moveMessage);
+  socket.on("data", message => {
+    console.log(`server says: ${JSON.stringify(message)}`);
+    if (message.messageType === MessageType.gameStart) {
+      current = message.data.start;
+      target = message.data.goal;
+      console.log(`I sends: ${JSON.stringify(moveMessage())}`);
+      socket.write(moveMessage());
     }
   });
 };
