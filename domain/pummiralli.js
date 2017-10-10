@@ -48,7 +48,7 @@ export default class Pummiralli {
       messageType: MessageType.gameStart,
       data: {
         start: new Position(0, 0),
-        goal: new Position(4900, 4900),
+        goal: new Position(-4900, 4900),
       },
     };
   }
