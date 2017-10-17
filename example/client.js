@@ -5,6 +5,7 @@ import { MessageType } from "../domain/messages";
 
 const PORT = 8099;
 const myName = "test kikkula";
+const pummiRate = 0.1;
 let current;
 let target;
 
@@ -13,6 +14,14 @@ const moveMessage = () => {
   return {
     messageType: "move",
     data: { angle: (target.y - current.y) < 0 ? Math.PI - atan : atan },
+  };
+};
+
+const pummiMessage = () => {
+  console.log("PUMMI! Where the fuck am I?");
+  return {
+    messageType: "move",
+    data: { angle: Math.random() * 2 * Math.PI },
   };
 };
 
@@ -50,7 +59,11 @@ const createConnection = () => {
     if (message.messageType === MessageType.playerPositions) {
       current = myPosition(message.data);
       if (target !== undefined) {
-        socket.write(moveMessage());
+        if (Math.random() < pummiRate) {
+          socket.write(pummiMessage());
+        } else {
+          socket.write(moveMessage());
+        }
       }
     }
   });
