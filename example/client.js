@@ -5,9 +5,17 @@ import { MessageType } from "../domain/messages";
 
 const PORT = 8099;
 const myName = "test kikkula";
-const pummiRate = 0.1;
 let current;
 let target;
+
+let pummiRate = 0;
+if (process.argv.length > 2) {
+  pummiRate = parseFloat(process.argv[2]);
+  console.log(`My pummirate: ${pummiRate}`);
+  if (pummiRate < 0 || pummiRate > 1 || isNaN(pummiRate)) {
+    throw Error("ooppa ny rehelline!");
+  }
+}
 
 const moveMessage = () => {
   const atan = Math.atan((target.x - current.x) / Math.sqrt((target.y - current.y) ** 2 + 1e-12));
