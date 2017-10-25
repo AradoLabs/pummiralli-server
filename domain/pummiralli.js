@@ -100,36 +100,44 @@ export default class Pummiralli {
 
   processEventsReceivedDuringTick() {
     this.eventsReceived.forEach(event => {
-      const message = event.message;
-      console.log(
-        `processing event received during tick (type: ${message.messageType})`,
-      );
-      switch (message.messageType) {
-        case MessageType.join: {
-          const bot = new Bot(message.data.name, event.socket);
-          this.join(bot);
-          // for now just send the same join message back
-          bot.sendMessage(message);
-          break;
-        }
-        case MessageType.move: {
-          const bot = this.bots.find(b => b.socket === event.socket);
-          if (!bot) {
-            event.socket.write("could not find joined bot!");
-            break;
-          }
-          bot.handleMove({
-            angle: message.data.angle,
-          });
-          break;
-        }
-      }
+      this.process(event);
       this.eventHistory.push(event);
     });
     if (this.eventsReceived.length > 0) {
       console.log(`${this.eventHistory.length} events in history`);
     }
     this.eventsReceived.length = 0;
+  }
+
+  process(event: ClientMessage) {
+    const message = event.message;
+    console.log(
+      `processing event received during tick (type: ${message.messageType})`,
+    );
+    switch (message.messageType) {
+      case MessageType.join: {
+        const bot = new Bot(message.data.name, event.socket);
+        if (this.bots.map(b => b.name).includes(message.data.name)) {
+          bot.sendMessage(`The name '${message.data.name}' is already in use`);
+        } else {
+          this.join(bot);
+          // for now just send the same join message back
+          bot.sendMessage(message);
+        }
+        break;
+      }
+      case MessageType.move: {
+        const bot = this.bots.find(b => b.socket === event.socket);
+        if (!bot) {
+          event.socket.write("could not find joined bot!");
+          break;
+        }
+        bot.handleMove({
+          angle: message.data.angle,
+        });
+        break;
+      }
+    }
   }
 
   tick() {

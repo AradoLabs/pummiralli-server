@@ -4,13 +4,18 @@ import jot from "json-over-tcp";
 import { MessageType } from "../domain/messages";
 
 const PORT = 8099;
-const myName = "test kikkula";
+let myName = "test kikkula";
 let current;
 let target;
 
-let pummiRate = 0;
 if (process.argv.length > 2) {
-  pummiRate = parseFloat(process.argv[2]);
+  myName = process.argv[2];
+  console.log(`My name: ${myName}`);
+}
+
+let pummiRate = 0;
+if (process.argv.length > 3) {
+  pummiRate = parseFloat(process.argv[3]);
   console.log(`My pummirate: ${pummiRate}`);
   if (pummiRate < 0 || pummiRate > 1 || isNaN(pummiRate)) {
     throw Error("ooppa ny rehelline!");
