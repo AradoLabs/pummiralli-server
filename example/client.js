@@ -41,7 +41,7 @@ const pummiMessage = () => {
 };
 
 const stampMessage = () => {
-  console.log("I will now send a stamp");
+  console.log("I send: a stamp.");
   return {
     messageType: "stamp",
     data: { x: current.x, y: current.y },
@@ -76,7 +76,7 @@ const createConnection = () => {
     if (message.messageType === MessageType.gameStart) {
       current = message.data.start;
       target = message.data.goal;
-      console.log(`I sends: ${JSON.stringify(moveMessage())}`);
+      console.log(`I send: ${JSON.stringify(moveMessage())}`);
       socket.write(moveMessage());
     }
     if (message.messageType === MessageType.playerPositions) {

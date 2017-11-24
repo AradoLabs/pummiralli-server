@@ -37,6 +37,6 @@ export default class Bot {
   }
 
   handleStamp(message: StampMessageData) {
-    console.log(`Stamp received: x: '${message.x}' y: '${message.y}'`);
+    console.log(`Stamp received: x: '${message}' y: '${message}'`);
   }
 }

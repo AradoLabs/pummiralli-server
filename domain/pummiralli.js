@@ -143,7 +143,7 @@ export default class Pummiralli {
           event.socket.write("could not find joined bot!");
           break;
         }
-        bot.handleStamp(message.data.position);
+        bot.handleStamp(message.data);
         break;
       }
     }
