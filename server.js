@@ -4,6 +4,7 @@ import Ajv from "ajv";
 import schema from "./messages/schema.json";
 import Pummiralli from "./domain/pummiralli";
 import log from "./util/log";
+require("babel-regenerator-runtime");
 
 const validateMessage = new Ajv().compile(schema);
 const PORT = 8099;
@@ -30,13 +31,12 @@ const clientConnectionHandler = socket => {
   socket.on("close", () => connectionClosedHandler(socket));
   socket.on("error", errorHandler);
   socket.on("data", async message => {
-    socketAddress = socket.address();
-    if (!validateMessage(message)) {
-      socket.write(
-        `Invalid message: ${JSON.stringify(validateMessage.errors)}`
-      );
-      return;
-    }
+    // if (!validateMessage(message)) {
+    //   socket.write(
+    //     `Invalid message: ${JSON.stringify(validateMessage.errors)}`,
+    //   );
+    //   return;
+    // }
     ralli.collectMessage(socket, message);
   });
 };

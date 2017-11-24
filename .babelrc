@@ -5,7 +5,13 @@
     "transform-export-extensions",
     "transform-flow-strip-types",
     "transform-object-rest-spread",
-    "transform-async-to-generator"
+    "transform-async-to-generator",
+    ["transform-regenerator", {
+      "asyncGenerators": true,
+      "generators": true,
+      "async": true
+    }]
   ],
-  "retainLines": true
+  "retainLines": true,
+  "sourceMaps": true
 }

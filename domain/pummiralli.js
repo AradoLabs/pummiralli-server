@@ -59,7 +59,7 @@ export default class Pummiralli {
       messageType: MessageType.gameStart,
       data: {
         start: new Position(0, 0),
-        goal: new Position(-4900, 4900),
+        goal: new Position(-19, 19),
       },
     };
   }
@@ -146,6 +146,15 @@ export default class Pummiralli {
         bot.handleMove({
           angle: message.data.angle,
         });
+        break;
+      }
+      case MessageType.stamp: {
+        const bot = this.bots.find(b => b.socket === event.socket);
+        if (!bot) {
+          event.socket.write("could not find joined bot!");
+          break;
+        }
+        bot.handleStamp(message.data);
         break;
       }
     }

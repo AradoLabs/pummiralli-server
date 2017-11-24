@@ -40,6 +40,14 @@ const pummiMessage = () => {
   };
 };
 
+const stampMessage = () => {
+  console.log("I send: a stamp.");
+  return {
+    messageType: "stamp",
+    data: { x: current.x, y: current.y },
+  };
+};
+
 const myPosition = playerPositions => {
   let my;
   playerPositions.forEach(data => {
@@ -68,7 +76,7 @@ const createConnection = () => {
     if (message.messageType === MessageType.gameStart) {
       current = message.data.start;
       target = message.data.goal;
-      console.log(`I sends: ${JSON.stringify(moveMessage())}`);
+      console.log(`I send: ${JSON.stringify(moveMessage())}`);
       socket.write(moveMessage());
     }
     if (message.messageType === MessageType.playerPositions) {
@@ -78,6 +86,14 @@ const createConnection = () => {
           socket.write(pummiMessage());
         } else {
           socket.write(moveMessage());
+          if (
+            Math.sqrt(
+              (current.x - target.x) * (current.x - target.x) +
+                (current.y - target.y) * (current.y - target.y)
+            ) < 5.0
+          ) {
+            socket.write(stampMessage());
+          }
         }
       }
     }
