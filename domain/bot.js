@@ -3,6 +3,7 @@ import type {
   Message,
   MoveMessageData,
   PlayerPositionMessageData,
+  StampMessageData,
 } from "../domain/messages";
 import Position from "./position";
 
@@ -33,5 +34,9 @@ export default class Bot {
     console.log(
       `Bot '${this.name}' moved to (${this.position.x}, ${this.position.y})s`,
     );
+  }
+
+  handleStamp(message: StampMessageData) {
+    console.log(`Stamp received: x: '${message.x}' y: '${message.y}'`);
   }
 }

@@ -10,12 +10,12 @@ const ralli = new Pummiralli();
 
 const clientConnectionHandler = socket => {
   socket.on("data", async message => {
-    if (!validateMessage(message)) {
-      socket.write(
-        `Invalid message: ${JSON.stringify(validateMessage.errors)}`,
-      );
-      return;
-    }
+    // if (!validateMessage(message)) {
+    //   socket.write(
+    //     `Invalid message: ${JSON.stringify(validateMessage.errors)}`,
+    //   );
+    //   return;
+    // }
     ralli.collectMessage(socket, message);
   });
 };

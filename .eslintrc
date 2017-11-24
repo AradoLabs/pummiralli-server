@@ -13,6 +13,7 @@
     "jsx-quotes": [2, "prefer-double"],
     "prefer-template": 1,
     "template-curly-spacing": ["error", "never"],
-    "quotes": [2, "double", { "allowTemplateLiterals": true }]
+    "quotes": [2, "double", { "allowTemplateLiterals": true }],
+    "max-statements": 0
   }
 }
