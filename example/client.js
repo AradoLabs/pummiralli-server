@@ -23,10 +23,12 @@ if (process.argv.length > 3) {
 }
 
 const moveMessage = () => {
-  const atan = Math.atan((target.x - current.x) / Math.sqrt((target.y - current.y) ** 2 + 1e-12));
+  const atan = Math.atan(
+    (target.x - current.x) / Math.sqrt((target.y - current.y) ** 2 + 1e-12),
+  );
   return {
     messageType: "move",
-    data: { angle: (target.y - current.y) < 0 ? Math.PI - atan : atan },
+    data: { angle: target.y - current.y < 0 ? Math.PI - atan : atan },
   };
 };
 
@@ -38,7 +40,15 @@ const pummiMessage = () => {
   };
 };
 
-const myPosition = (playerPositions) => {
+const stampMessage = () => {
+  console.log("I send: a stamp.");
+  return {
+    messageType: "stamp",
+    data: { x: current.x, y: current.y },
+  };
+};
+
+const myPosition = playerPositions => {
   let my;
   playerPositions.forEach(data => {
     if (myName === data.name) {
@@ -66,7 +76,7 @@ const createConnection = () => {
     if (message.messageType === MessageType.gameStart) {
       current = message.data.start;
       target = message.data.goal;
-      console.log(`I sends: ${JSON.stringify(moveMessage())}`);
+      console.log(`I send: ${JSON.stringify(moveMessage())}`);
       socket.write(moveMessage());
     }
     if (message.messageType === MessageType.playerPositions) {
@@ -76,6 +86,14 @@ const createConnection = () => {
           socket.write(pummiMessage());
         } else {
           socket.write(moveMessage());
+          if (
+            Math.sqrt(
+              (current.x - target.x) * (current.x - target.x) +
+                (current.y - target.y) * (current.y - target.y),
+            ) < 5.0
+          ) {
+            socket.write(stampMessage());
+          }
         }
       }
     }
