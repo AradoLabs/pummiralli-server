@@ -7,5 +7,6 @@
     "transform-object-rest-spread",
     "transform-async-to-generator"
   ],
-  "retainLines": true
+  "retainLines": true,
+  "sourceMaps": true
 }
