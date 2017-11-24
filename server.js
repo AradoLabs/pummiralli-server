@@ -3,6 +3,7 @@ import jot from "json-over-tcp";
 import Ajv from "ajv";
 import schema from "./messages/schema.json";
 import Pummiralli from "./domain/pummiralli";
+require("babel-regenerator-runtime");
 
 const validateMessage = new Ajv().compile(schema);
 const PORT = 8099;

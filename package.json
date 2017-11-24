@@ -7,13 +7,14 @@
     "test": "jest",
     "transpile": "./node_modules/.bin/babel *.js example/*.js data/*.js domain/*.js --source-maps --out-dir .compiled/",
     "copy-messages": "cp -r messages/ .compiled/",
-    "build": "yarn run transpile && yarn run copy-messages" 
+    "build": "yarn run transpile && yarn run copy-messages"
   },
   "dependencies": {
     "ajv": "^5.2.3",
     "babel-cli": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
+    "babel-regenerator-runtime": "^6.5.0",
     "json-over-tcp": "^0.3.2"
   },
   "devDependencies": {
