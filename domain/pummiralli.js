@@ -1,10 +1,10 @@
 // @flow
 import type {
   Message,
-    GameStartMessage,
-    GameEndMessage,
-    PlayerPositionsMessage,
-    ClientMessage,
+  GameStartMessage,
+  GameEndMessage,
+  PlayerPositionsMessage,
+  ClientMessage,
 } from "../domain/messages";
 import { MessageType } from "../domain/messages";
 import Bot from "../domain/bot";
@@ -30,7 +30,7 @@ export default class Pummiralli {
   collectMessage(socket: any, message: Message) {
     const client = socket.address();
     console.log(
-      `received '${message.messageType}' from ${client.address}:${client.port}`,
+      `received '${message.messageType}' from ${client.address}:${client.port}`
     );
     this.eventsReceived.push({
       tick: this.currentGameTick,
@@ -41,6 +41,17 @@ export default class Pummiralli {
 
   join(bot: Bot) {
     this.bots.push(bot);
+  }
+
+  drop(socket: any) {
+    const botToBeDropped = this.bots.find(b => b.socket === socket);
+    if (!botToBeDropped) {
+      console.log("could not find bot to be dropped!");
+      return;
+    }
+    this.bots.splice(this.bots.indexOf(botToBeDropped), 1);
+    console.log(`removed bot`);
+    return;
   }
 
   generateStartMessage(): GameStartMessage {
@@ -73,11 +84,11 @@ export default class Pummiralli {
     this.tickInterval = setInterval(() => {
       this.tick();
       console.log(
-        `tick ${this.currentGameTick} - waiting for ${TICK_INTERVAL}ms`,
+        `tick ${this.currentGameTick} - waiting for ${TICK_INTERVAL}ms`
       );
     }, TICK_INTERVAL);
     console.log(
-      `Pummiralli starting in ${GAME_START_DELAY}ms - waiting for bots..`,
+      `Pummiralli starting in ${GAME_START_DELAY}ms - waiting for bots..`
     );
     setTimeout(() => {
       if (this.bots.length === 0) {
@@ -112,7 +123,7 @@ export default class Pummiralli {
   process(event: ClientMessage) {
     const message = event.message;
     console.log(
-      `processing event received during tick (type: ${message.messageType})`,
+      `processing event received during tick (type: ${message.messageType})`
     );
     switch (message.messageType) {
       case MessageType.join: {

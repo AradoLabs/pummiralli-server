@@ -23,10 +23,12 @@ if (process.argv.length > 3) {
 }
 
 const moveMessage = () => {
-  const atan = Math.atan((target.x - current.x) / Math.sqrt((target.y - current.y) ** 2 + 1e-12));
+  const atan = Math.atan(
+    (target.x - current.x) / Math.sqrt((target.y - current.y) ** 2 + 1e-12)
+  );
   return {
     messageType: "move",
-    data: { angle: (target.y - current.y) < 0 ? Math.PI - atan : atan },
+    data: { angle: target.y - current.y < 0 ? Math.PI - atan : atan },
   };
 };
 
@@ -38,7 +40,7 @@ const pummiMessage = () => {
   };
 };
 
-const myPosition = (playerPositions) => {
+const myPosition = playerPositions => {
   let my;
   playerPositions.forEach(data => {
     if (myName === data.name) {
