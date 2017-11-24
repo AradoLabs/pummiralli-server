@@ -5,7 +5,8 @@
     "start": "babel-node --presets es2015,stage-0 server.js",
     "test-client": "babel-node --presets es2015,stage-0 example/client.js",
     "test": "jest",
-    "transpile": "./node_modules/.bin/babel *.js example/*.js data/*.js domain/*.js --source-maps --out-dir .compiled/",
+    "transpile":
+      "./node_modules/.bin/babel *.js example/*.js data/*.js domain/*.js --source-maps --out-dir .compiled/",
     "copy-messages": "cp -r messages/ .compiled/",
     "build": "yarn run transpile && yarn run copy-messages"
   },
