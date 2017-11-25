@@ -3,7 +3,6 @@ import type {
   Message,
   MoveMessageData,
   PlayerPositionMessageData,
-  StampMessageData,
 } from "../domain/messages";
 import Position from "./position";
 
@@ -29,14 +28,18 @@ export default class Bot {
     this.socket.write(message);
   }
 
-  handleMove(message: MoveMessageData) {
-    this.position.updatePosition(message.angle, 1);
-    console.log(
-      `Bot '${this.name}' moved to (${this.position.x}, ${this.position.y})s`,
-    );
+  sendError(message: string) {
+    this.socket.write(message);
   }
 
-  handleStamp(message: StampMessageData) {
-    console.log(`Stamp received: x: '${message}' y: '${message}'`);
+  handleMove(message: MoveMessageData) {
+    const { x, y } = this.position;
+    this.position.updatePosition(message.angle, 1);
+    console.log(`${this.name} moved to (${x}, ${y})`);
+  }
+
+  handleStamp() {
+    const { x, y } = this.position;
+    console.log(`STAMP: '${this.name}' at (${x}, ${y})`);
   }
 }

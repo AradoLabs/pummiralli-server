@@ -41,10 +41,9 @@ const pummiMessage = () => {
 };
 
 const stampMessage = () => {
-  console.log("I send: a stamp.");
+  console.log("I send: a stamp. ");
   return {
     messageType: "stamp",
-    data: { x: current.x, y: current.y },
   };
 };
 

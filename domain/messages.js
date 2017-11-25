@@ -2,12 +2,19 @@
 import type Position from "./position";
 
 export const MessageType = {
+  error: "error",
   join: "join",
   move: "move",
+  map: "map",
   gameStart: "gameStart",
   gameEnd: "gameEnd",
   playerPositions: "playerPositions",
   stamp: "stamp",
+};
+
+export type ErrorMessage = {
+  messageType: "error",
+  message: string,
 };
 
 export type JoinMessageData = {
@@ -28,8 +35,19 @@ export type MoveMessage = {
   data: MoveMessageData,
 };
 
+export type MapMessageData = {
+  width: number,
+  height: number,
+  checkpoints: Array<Position>,
+};
+
+export type MapMessage = {
+  messageType: "map",
+  data: MapMessageData,
+};
+
 export type GameStartMessageData = {
-  field: any,
+  start: Position,
 };
 
 export type GameStartMessage = {
@@ -66,6 +84,7 @@ export type StampMessage = {
 };
 
 export type Message =
+  | ErrorMessage
   | JoinMessage
   | MoveMessage
   | GameStartMessage

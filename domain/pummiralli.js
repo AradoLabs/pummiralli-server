@@ -1,6 +1,7 @@
 // @flow
 import type {
   Message,
+  MapMessage,
   GameStartMessage,
   GameEndMessage,
   PlayerPositionsMessage,
@@ -10,7 +11,8 @@ import { MessageType } from "../domain/messages";
 import Bot from "../domain/bot";
 import Position from "./position";
 
-const GAME_START_DELAY = 10000;
+const MAP_DELAY = 10000;
+const GAME_START_DELAY = 20000;
 const TICK_INTERVAL = 1000;
 
 export default class Pummiralli {
@@ -46,9 +48,17 @@ export default class Pummiralli {
   generateStartMessage(): GameStartMessage {
     return {
       messageType: MessageType.gameStart,
+      data: { start: new Position(500, 500) },
+    };
+  }
+
+  generateMapMessage(): MapMessage {
+    return {
+      messageType: MessageType.map,
       data: {
-        start: new Position(0, 0),
-        goal: new Position(-19, 19),
+        width: 5000,
+        height: 5000,
+        checkpoints: [new Position(100, 100), new Position(4200, 2500)],
       },
     };
   }
@@ -81,7 +91,19 @@ export default class Pummiralli {
     );
     setTimeout(() => {
       if (this.bots.length === 0) {
-        console.log("no bots connected!");
+        console.log("no bots connected - won't send the map!");
+        clearInterval(this.tickInterval);
+        return;
+      }
+      console.log("generating map message");
+      const mapMessage = this.generateMapMessage();
+      console.log(`sending map message to ${this.bots.length} bots`);
+      this.bots.map(bot => bot.sendMessage(mapMessage));
+    }, MAP_DELAY);
+
+    setTimeout(() => {
+      if (this.bots.length === 0) {
+        console.log("no bots connected - won't start the game!");
         clearInterval(this.tickInterval);
         return;
       }
@@ -118,7 +140,7 @@ export default class Pummiralli {
       case MessageType.join: {
         const bot = new Bot(message.data.name, event.socket);
         if (this.bots.map(b => b.name).includes(message.data.name)) {
-          bot.sendMessage(`The name '${message.data.name}' is already in use`);
+          bot.sendError(`The name '${message.data.name}' is already in use`);
         } else {
           this.join(bot);
           // for now just send the same join message back
@@ -143,7 +165,7 @@ export default class Pummiralli {
           event.socket.write("could not find joined bot!");
           break;
         }
-        bot.handleStamp(message.data);
+        bot.handleStamp();
         break;
       }
     }
