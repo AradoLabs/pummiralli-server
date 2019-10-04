@@ -8,6 +8,7 @@ export const MessageType = {
   gameEnd: "gameEnd",
   playerPositions: "playerPositions",
   stamp: "stamp",
+  error: "error",
 };
 
 export type JoinMessageData = {
@@ -29,7 +30,8 @@ export type MoveMessage = {
 };
 
 export type GameStartMessageData = {
-  field: any,
+  start: Position,
+  goal: Position,
 };
 
 export type GameStartMessage = {
@@ -65,13 +67,23 @@ export type StampMessage = {
   data: StampMessageData,
 };
 
+export type ErrorMessageData = {
+  message: string,
+};
+
+export type ErrorMessage = {
+  messageType: "error",
+  data: ErrorMessageData,
+};
+
 export type Message =
   | JoinMessage
   | MoveMessage
   | GameStartMessage
   | GameEndMessage
   | PlayerPositionsMessage
-  | StampMessage;
+  | StampMessage
+  | ErrorMessage;
 
 export type ClientMessage = {
   tick: number,

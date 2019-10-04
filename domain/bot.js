@@ -6,6 +6,7 @@ import type {
   StampMessageData,
 } from "../domain/messages";
 import Position from "./position";
+import Log from "../util/log";
 
 export default class Bot {
   name: string;
@@ -31,12 +32,12 @@ export default class Bot {
 
   handleMove(message: MoveMessageData) {
     this.position.updatePosition(message.angle, 1);
-    console.log(
-      `Bot '${this.name}' moved to (${this.position.x}, ${this.position.y})s`,
-    );
+    Log.moveMessage(this.name, this.position);
   }
 
   handleStamp(message: StampMessageData) {
-    console.log(`Stamp received: x: '${message}' y: '${message}'`);
+    console.log(
+      `Stamp received: x: '${message.position.x}' y: '${message.position.y}'`
+    );
   }
 }

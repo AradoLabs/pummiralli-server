@@ -5,10 +5,12 @@ import type {
   GameEndMessage,
   PlayerPositionsMessage,
   ClientMessage,
-} from "../domain/messages";
-import { MessageType } from "../domain/messages";
-import Bot from "../domain/bot";
+  ErrorMessage,
+} from "./messages";
+import { MessageType } from "./messages";
+import Bot from "./bot";
 import Position from "./position";
+import Log from "../util/log";
 
 const GAME_START_DELAY = 10000;
 const TICK_INTERVAL = 1000;
@@ -29,7 +31,10 @@ export default class Pummiralli {
 
   collectMessage(socket: any, message: Message) {
     const client = socket.address();
-    console.log(
+    // console.log(
+    //   `received '${message.messageType}' from ${client.address}:${client.port}`
+    // );
+    Log.news(
       `received '${message.messageType}' from ${client.address}:${client.port}`
     );
     this.eventsReceived.push({
@@ -46,11 +51,13 @@ export default class Pummiralli {
   drop(socket: any) {
     const botToBeDropped = this.bots.find(b => b.socket === socket);
     if (!botToBeDropped) {
-      console.log("could not find bot to be dropped!");
+      // console.log("could not find bot to be dropped!");
+      Log.error("could not find bot to be dropped!");
       return;
     }
     this.bots.splice(this.bots.indexOf(botToBeDropped), 1);
-    console.log(`removed bot`);
+    // console.log(`removed bot`);
+    Log.vapor(`removed bot`);
     return;
   }
 
@@ -80,19 +87,27 @@ export default class Pummiralli {
     };
   }
 
+  generateErrorMessage(message: string): ErrorMessage {
+    return {
+      messageType: MessageType.error,
+      data: { message },
+    };
+  }
+
   start() {
     this.tickInterval = setInterval(() => {
       this.tick();
-      console.log(
-        `tick ${this.currentGameTick} - waiting for ${TICK_INTERVAL}ms`
-      );
+      // console.log(
+      //   `tick ${this.currentGameTick} - waiting for ${TICK_INTERVAL}ms`
+      // );
+      Log.info(`tick ${this.currentGameTick} - waiting for ${TICK_INTERVAL}ms`);
     }, TICK_INTERVAL);
-    console.log(
+    Log.success(
       `Pummiralli starting in ${GAME_START_DELAY}ms - waiting for bots..`
     );
     setTimeout(() => {
       if (this.bots.length === 0) {
-        console.log("no bots connected!");
+        Log.alert("no bots connected!");
         clearInterval(this.tickInterval);
         return;
       }
@@ -129,7 +144,11 @@ export default class Pummiralli {
       case MessageType.join: {
         const bot = new Bot(message.data.name, event.socket);
         if (this.bots.map(b => b.name).includes(message.data.name)) {
-          bot.sendMessage(`The name '${message.data.name}' is already in use`);
+          bot.sendMessage(
+            this.generateErrorMessage(
+              `The name '${message.data.name}' is already in use`
+            )
+          );
         } else {
           this.join(bot);
           // for now just send the same join message back
