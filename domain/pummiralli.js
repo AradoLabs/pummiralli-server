@@ -6,10 +6,11 @@ import type {
   GameEndMessage,
   PlayerPositionsMessage,
   ClientMessage,
-} from "../domain/messages";
-import { MessageType } from "../domain/messages";
-import Bot from "../domain/bot";
+} from "./messages";
+import { MessageType } from "./messages";
+import Bot from "./bot";
 import Position from "./position";
+import Log from "../util/log";
 
 const MAP_DELAY = 10000;
 const GAME_START_DELAY = 20000;
@@ -31,8 +32,11 @@ export default class Pummiralli {
 
   collectMessage(socket: any, message: Message) {
     const client = socket.address();
-    console.log(
-      `received '${message.messageType}' from ${client.address}:${client.port}`,
+    // console.log(
+    //   `received '${message.messageType}' from ${client.address}:${client.port}`
+    // );
+    Log.news(
+      `received '${message.messageType}' from ${client.address}:${client.port}`
     );
     this.eventsReceived.push({
       tick: this.currentGameTick,
@@ -45,10 +49,23 @@ export default class Pummiralli {
     this.bots.push(bot);
   }
 
+  drop(socket: any) {
+    const botToBeDropped = this.bots.find(b => b.socket === socket);
+    if (!botToBeDropped) {
+      // console.log("could not find bot to be dropped!");
+      Log.error("could not find bot to be dropped!");
+      return;
+    }
+    this.bots.splice(this.bots.indexOf(botToBeDropped), 1);
+    // console.log(`removed bot`);
+    Log.vapor(`removed bot`);
+    return;
+  }
+
   generateStartMessage(): GameStartMessage {
     return {
       messageType: MessageType.gameStart,
-      data: { start: new Position(500, 500) },
+      data: { start: new Position(50, 50), goal: new Position(500, 500) },
     };
   }
 
@@ -82,12 +99,13 @@ export default class Pummiralli {
   start() {
     this.tickInterval = setInterval(() => {
       this.tick();
-      console.log(
-        `tick ${this.currentGameTick} - waiting for ${TICK_INTERVAL}ms`,
-      );
+      // console.log(
+      //   `tick ${this.currentGameTick} - waiting for ${TICK_INTERVAL}ms`
+      // );
+      Log.info(`tick ${this.currentGameTick} - waiting for ${TICK_INTERVAL}ms`);
     }, TICK_INTERVAL);
-    console.log(
-      `Pummiralli starting in ${GAME_START_DELAY}ms - waiting for bots..`,
+    Log.success(
+      `Pummiralli starting in ${GAME_START_DELAY}ms - waiting for bots..`
     );
     setTimeout(() => {
       if (this.bots.length === 0) {
@@ -103,7 +121,7 @@ export default class Pummiralli {
 
     setTimeout(() => {
       if (this.bots.length === 0) {
-        console.log("no bots connected - won't start the game!");
+        Log.alert("no bots connected - won't start the game!");
         clearInterval(this.tickInterval);
         return;
       }
@@ -134,7 +152,7 @@ export default class Pummiralli {
   process(event: ClientMessage) {
     const message = event.message;
     console.log(
-      `processing event received during tick (type: ${message.messageType})`,
+      `processing event received during tick (type: ${message.messageType})`
     );
     switch (message.messageType) {
       case MessageType.join: {

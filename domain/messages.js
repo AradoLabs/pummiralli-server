@@ -48,6 +48,7 @@ export type MapMessage = {
 
 export type GameStartMessageData = {
   start: Position,
+  goal: Position,
 };
 
 export type GameStartMessage = {
@@ -90,7 +91,8 @@ export type Message =
   | GameStartMessage
   | GameEndMessage
   | PlayerPositionsMessage
-  | StampMessage;
+  | StampMessage
+  | MapMessage;
 
 export type ClientMessage = {
   tick: number,

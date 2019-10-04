@@ -2,6 +2,8 @@
 
 import jot from "json-over-tcp";
 import { MessageType } from "../domain/messages";
+import type { PlayerPositionMessageData } from "../domain/messages";
+import Position from "../domain/position";
 
 const PORT = 8099;
 let myName = "test kikkula";
@@ -24,7 +26,7 @@ if (process.argv.length > 3) {
 
 const moveMessage = () => {
   const atan = Math.atan(
-    (target.x - current.x) / Math.sqrt((target.y - current.y) ** 2 + 1e-12),
+    (target.x - current.x) / Math.sqrt((target.y - current.y) ** 2 + 1e-12)
   );
   return {
     messageType: "move",
@@ -47,15 +49,12 @@ const stampMessage = () => {
   };
 };
 
-const myPosition = playerPositions => {
-  let my;
-  playerPositions.forEach(data => {
-    if (myName === data.name) {
-      my = data.position;
-      return;
-    }
-  });
-  return my;
+const myPosition = (playerPositions: Array<PlayerPositionMessageData>) => {
+  const playerInfo = playerPositions.find(player => myName === player.name);
+  if (playerInfo && playerInfo.position) {
+    return playerInfo.position;
+  }
+  return new Position(0, 0);
 };
 
 const joinMessage = {
@@ -88,7 +87,7 @@ const createConnection = () => {
           if (
             Math.sqrt(
               (current.x - target.x) * (current.x - target.x) +
-                (current.y - target.y) * (current.y - target.y),
+                (current.y - target.y) * (current.y - target.y)
             ) < 5.0
           ) {
             socket.write(stampMessage());

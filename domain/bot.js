@@ -5,6 +5,7 @@ import type {
   PlayerPositionMessageData,
 } from "../domain/messages";
 import Position from "./position";
+import Log from "../util/log";
 
 export default class Bot {
   name: string;
@@ -33,9 +34,8 @@ export default class Bot {
   }
 
   handleMove(message: MoveMessageData) {
-    const { x, y } = this.position;
     this.position.updatePosition(message.angle, 1);
-    console.log(`${this.name} moved to (${x}, ${y})`);
+    Log.moveMessage(this.name, this.position);
   }
 
   handleStamp() {
