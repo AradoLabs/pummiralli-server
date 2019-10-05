@@ -3,13 +3,13 @@
   "name": "pummiralli-server",
   "main": "src/server.ts",
   "scripts": {
-    "start": "yarn run build && node .compiled/server.js",
+    "start": "yarn build && node .compiled/server.js",
     "test-client": "node .compiled/example/client.js",
     "debug": "yarn build && yarn start",
     "test": "jest",
     "transpile": "tsc",
     "copy-messages": "cp -r src/messages/ .compiled/messages/",
-    "build": "yarn run transpile && yarn run copy-messages"
+    "build": "yarn transpile && yarn run copy-messages"
   },
   "jest": {
     "roots": [
