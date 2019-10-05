@@ -1,8 +1,19 @@
 {
-  "extends": "formidable/configurations/es6-react",
-  "parser": "babel-eslint",
+  "parser": "@typescript-eslint/parser",
   "env": {
     "browser": true
+  },
+  "extends": [
+    "plugin:@typescript-eslint/recommended",
+    "prettier/@typescript-eslint", // Uses eslint-config-prettier to disable ESLint rules from @typescript-eslint/eslint-plugin that would conflict with prettier
+    "plugin:prettier/recommended"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 2018, // Allows for the parsing of modern ECMAScript features
+    "sourceType": "module", // Allows for the use of imports
+    "ecmaFeatures": {
+      "jsx": true // Allows for the parsing of JSX
+    }
   },
   "rules": {
     "indent": 0,
@@ -13,7 +24,7 @@
     "jsx-quotes": [2, "prefer-double"],
     "prefer-template": 1,
     "template-curly-spacing": ["error", "never"],
-    "quotes": [2, "double", { "allowTemplateLiterals": true }],
+
     "max-statements": 0
   }
 }

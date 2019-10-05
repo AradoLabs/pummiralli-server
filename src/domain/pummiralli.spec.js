@@ -1,5 +1,5 @@
 import net from "net";
-import Pummiralli from "../domain/pummiralli";
+import Pummiralli from "./pummiralli";
 import jot from "json-over-tcp";
 
 test("collects message correctly", () => {
@@ -30,6 +30,6 @@ test.skip("name needs to be unique", () => {
       name: "test",
     },
   });
-  ralli.processEventsReceivedDuringTick()
+  ralli.processEventsReceivedDuringTick();
   expect(ralli.bots.length).toBe(1);
 });

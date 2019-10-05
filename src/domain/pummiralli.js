@@ -6,11 +6,11 @@ import type {
   GameEndMessage,
   PlayerPositionsMessage,
   ClientMessage,
-} from "./messages";
-import { MessageType } from "./messages";
-import Bot from "./bot";
-import Position from "./position";
-import Log from "../util/log";
+} from './messages';
+import { MessageType } from './messages';
+import Bot from './bot';
+import Position from './position';
+import Log from '../util/log';
 
 const MAP_DELAY = 10000;
 const GAME_START_DELAY = 20000;
@@ -35,9 +35,7 @@ export default class Pummiralli {
     // console.log(
     //   `received '${message.messageType}' from ${client.address}:${client.port}`
     // );
-    Log.news(
-      `received '${message.messageType}' from ${client.address}:${client.port}`
-    );
+    Log.news(`received '${message.messageType}' from ${client.address}:${client.port}`);
     this.eventsReceived.push({
       tick: this.currentGameTick,
       socket,
@@ -53,7 +51,7 @@ export default class Pummiralli {
     const botToBeDropped = this.bots.find(b => b.socket === socket);
     if (!botToBeDropped) {
       // console.log("could not find bot to be dropped!");
-      Log.error("could not find bot to be dropped!");
+      Log.error('could not find bot to be dropped!');
       return;
     }
     this.bots.splice(this.bots.indexOf(botToBeDropped), 1);
@@ -64,14 +62,14 @@ export default class Pummiralli {
 
   generateStartMessage(): GameStartMessage {
     return {
-      messageType: MessageType.gameStart,
+      messageType: MessageType.GameStart,
       data: { start: new Position(50, 50), goal: new Position(500, 500) },
     };
   }
 
   generateMapMessage(): MapMessage {
     return {
-      messageType: MessageType.map,
+      messageType: MessageType.Map,
       data: {
         width: 5000,
         height: 5000,
@@ -82,7 +80,7 @@ export default class Pummiralli {
 
   generateEndMessage(): GameEndMessage {
     return {
-      messageType: MessageType.gameEnd,
+      messageType: MessageType.GameEnd,
       data: {
         winner: {},
       },
@@ -91,7 +89,7 @@ export default class Pummiralli {
 
   generatePlayerPositionsMessage(): PlayerPositionsMessage {
     return {
-      messageType: MessageType.playerPositions,
+      messageType: MessageType.PlayerPositions,
       data: this.bots.map(bot => bot.getCurrentPosition()),
     };
   }
@@ -104,16 +102,14 @@ export default class Pummiralli {
       // );
       Log.info(`tick ${this.currentGameTick} - waiting for ${TICK_INTERVAL}ms`);
     }, TICK_INTERVAL);
-    Log.success(
-      `Pummiralli starting in ${GAME_START_DELAY}ms - waiting for bots..`
-    );
+    Log.success(`Pummiralli starting in ${GAME_START_DELAY}ms - waiting for bots..`);
     setTimeout(() => {
       if (this.bots.length === 0) {
         console.log("no bots connected - won't send the map!");
         clearInterval(this.tickInterval);
         return;
       }
-      console.log("generating map message");
+      console.log('generating map message');
       const mapMessage = this.generateMapMessage();
       console.log(`sending map message to ${this.bots.length} bots`);
       this.bots.map(bot => bot.sendMessage(mapMessage));
@@ -125,7 +121,7 @@ export default class Pummiralli {
         clearInterval(this.tickInterval);
         return;
       }
-      console.log("generating start message");
+      console.log('generating start message');
       const gameStartMessage = this.generateStartMessage();
       console.log(`sending start message to ${this.bots.length} bots`);
       this.bots.map(bot => bot.sendMessage(gameStartMessage));
@@ -151,11 +147,9 @@ export default class Pummiralli {
 
   process(event: ClientMessage) {
     const message = event.message;
-    console.log(
-      `processing event received during tick (type: ${message.messageType})`
-    );
+    console.log(`processing event received during tick (type: ${message.messageType})`);
     switch (message.messageType) {
-      case MessageType.join: {
+      case MessageType.Join: {
         const bot = new Bot(message.data.name, event.socket);
         if (this.bots.map(b => b.name).includes(message.data.name)) {
           bot.sendError(`The name '${message.data.name}' is already in use`);
@@ -166,10 +160,10 @@ export default class Pummiralli {
         }
         break;
       }
-      case MessageType.move: {
+      case MessageType.Move: {
         const bot = this.bots.find(b => b.socket === event.socket);
         if (!bot) {
-          event.socket.write("could not find joined bot!");
+          event.socket.write('could not find joined bot!');
           break;
         }
         bot.handleMove({
@@ -177,10 +171,10 @@ export default class Pummiralli {
         });
         break;
       }
-      case MessageType.stamp: {
+      case MessageType.Stamp: {
         const bot = this.bots.find(b => b.socket === event.socket);
         if (!bot) {
-          event.socket.write("could not find joined bot!");
+          event.socket.write('could not find joined bot!');
           break;
         }
         bot.handleStamp();
