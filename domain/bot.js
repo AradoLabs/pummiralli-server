@@ -1,10 +1,7 @@
 // @flow
-import type {
-  Message,
-  MoveMessageData,
-  PlayerPositionMessageData,
-} from "../domain/messages";
+import type { Message, PlayerPositionMessageData } from "../domain/messages";
 import Position from "./position";
+import Map from "./map";
 
 export default class Bot {
   name: string;
@@ -32,14 +29,19 @@ export default class Bot {
     this.socket.write(message);
   }
 
-  handleMove(message: MoveMessageData) {
+  handleMove(angle: number, map: Map) {
     const { x, y } = this.position;
-    this.position.updatePosition(message.angle, 1);
+    this.position.updatePosition(angle, map.getSpeedAtPosition(this.position));
     console.log(`${this.name} moved to (${x}, ${y})`);
   }
 
-  handleStamp() {
+  handleStamp(map: Map) {
     const { x, y } = this.position;
-    console.log(`STAMP: '${this.name}' at (${x}, ${y})`);
+    const closeEnoughToCheckpoint = map.closeEnoughToCheckpoint(this.position);
+    console.log(
+      `STAMP: '${this.name}' at (${x}, ${y}) -- ${closeEnoughToCheckpoint
+        ? "CHECK!"
+        : "PUMMI"}`,
+    );
   }
 }
