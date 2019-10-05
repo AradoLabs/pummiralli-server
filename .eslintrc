@@ -1,7 +1,8 @@
 {
   "parser": "@typescript-eslint/parser",
   "env": {
-    "browser": true
+    "browser": true,
+    "jest": true
   },
   "extends": [
     "plugin:@typescript-eslint/recommended",
@@ -24,7 +25,7 @@
     "jsx-quotes": [2, "prefer-double"],
     "prefer-template": 1,
     "template-curly-spacing": ["error", "never"],
-
+    "no-undef": "error",
     "max-statements": 0
   }
 }

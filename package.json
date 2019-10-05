@@ -1,23 +1,34 @@
 {
+  "license": "UNLICENSED",
   "name": "pummiralli-server",
   "main": "src/server.ts",
   "scripts": {
-    "start": "node .compiled/server.js",
+    "start": "yarn run build && node .compiled/server.js",
     "test-client": "node .compiled/example/client.js",
     "debug": "yarn build && yarn start",
     "test": "jest",
     "transpile": "tsc",
-    "copy-messages": "cp -r messages/ .compiled/messages/",
+    "copy-messages": "cp -r src/messages/ .compiled/messages/",
     "build": "yarn run transpile && yarn run copy-messages"
+  },
+  "jest": {
+    "roots": [
+      "<rootDir>/src"
+    ],
+    "transform": {
+      "^.+\\.ts?$": "ts-jest"
+    }
   },
   "dependencies": {
     "ajv": "^5.2.3",
     "chalk": "^2.4.2",
-    "json-over-tcp": "^0.3.2"
+    "json-over-tcp": "^0.3.2",
+    "ramda": "^0.26.1"
   },
   "devDependencies": {
     "@types/jest": "^24.0.18",
     "@types/node": "^12.7.11",
+    "@types/ramda": "^0.26.26",
     "@typescript-eslint/eslint-plugin": "^2.3.2",
     "@typescript-eslint/parser": "^2.3.2",
     "eslint": "^6.5.1",
@@ -31,6 +42,7 @@
     "prettier": "^1.18.2",
     "regenerator-runtime": "^0.11.0",
     "shapeshifter": "^5.0.0",
+    "ts-jest": "^24.1.0",
     "typescript": "^3.6.3"
   }
 }

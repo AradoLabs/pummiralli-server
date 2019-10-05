@@ -1,5 +1,6 @@
-import { Message, MoveMessageData, PlayerPositionMessageData } from './messages';
+import { Message, PlayerPositionMessageData } from './messages';
 import Position from './position';
+import Map from './map';
 import Log from '../util/log';
 
 export default class Bot {
@@ -20,21 +21,26 @@ export default class Bot {
     };
   }
 
-  sendMessage(message: Message) {
+  sendMessage(message: Message): void {
     this.socket.write(message);
   }
 
-  sendError(message: string) {
+  sendError(message: string): void {
     this.socket.write(message);
   }
 
-  handleMove(message: MoveMessageData) {
-    this.position.updatePosition(message.angle, 1);
+  handleMove(angle: number, map: Map): void {
+    this.position.updatePosition(angle, map.getSpeedAtPosition(this.position));
     Log.moveMessage(this.name, this.position);
   }
 
-  handleStamp() {
+  handleStamp(map: Map): void {
     const { x, y } = this.position;
-    console.log(`STAMP: '${this.name}' at (${x}, ${y})`);
+    const closeEnoughToCheckpoint = map.closeEnoughToCheckpoint(this.position);
+    console.log(
+      `STAMP: '${this.name}' at (${x}, ${y}) -- ${
+        closeEnoughToCheckpoint ? 'CHECK!' : 'PUMMI'
+      }`,
+    );
   }
 }

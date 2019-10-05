@@ -9,6 +9,7 @@ import {
 import { MessageType } from './messages';
 import Bot from './bot';
 import Position from './position';
+import Map from './map';
 import Log from '../util/log';
 
 const MAP_DELAY = 10000;
@@ -21,12 +22,14 @@ export default class Pummiralli {
   bots: Array<Bot>;
   tickInterval: any;
   currentGameTick: number;
+  map: Map;
 
   constructor() {
     this.eventsReceived = [];
     this.eventHistory = [];
     this.bots = [];
     this.currentGameTick = 0;
+    this.map = new Map();
   }
 
   collectMessage(socket: any, message: Message) {
@@ -34,7 +37,9 @@ export default class Pummiralli {
     // console.log(
     //   `received '${message.messageType}' from ${client.address}:${client.port}`
     // );
-    Log.news(`received '${message.messageType}' from ${client.address}:${client.port}`);
+    Log.news(
+      `received '${message.messageType}' from ${client.address}:${client.port}`,
+    );
     this.eventsReceived.push({
       tick: this.currentGameTick,
       socket,
@@ -44,6 +49,8 @@ export default class Pummiralli {
 
   join(bot: Bot) {
     this.bots.push(bot);
+    Log.debug(`BOT JOINED:`);
+    Log.debugBot(bot);
   }
 
   drop(socket: any) {
@@ -70,9 +77,9 @@ export default class Pummiralli {
     return {
       messageType: MessageType.Map,
       data: {
-        width: 5000,
-        height: 5000,
-        checkpoints: [new Position(100, 100), new Position(4200, 2500)],
+        width: this.map.width,
+        height: this.map.height,
+        checkpoints: this.map.checkpoints,
       },
     };
   }
@@ -101,30 +108,37 @@ export default class Pummiralli {
       // );
       Log.info(`tick ${this.currentGameTick} - waiting for ${TICK_INTERVAL}ms`);
     }, TICK_INTERVAL);
-    Log.success(`Pummiralli starting in ${GAME_START_DELAY}ms - waiting for bots..`);
-    setTimeout(() => {
-      if (this.bots.length === 0) {
-        console.log("no bots connected - won't send the map!");
-        clearInterval(this.tickInterval);
-        return;
-      }
-      console.log('generating map message');
-      const mapMessage = this.generateMapMessage();
-      console.log(`sending map message to ${this.bots.length} bots`);
-      this.bots.map(bot => bot.sendMessage(mapMessage));
-    }, MAP_DELAY);
+    Log.success(
+      `Pummiralli starting in ${GAME_START_DELAY}ms - waiting for bots..`,
+    );
 
-    setTimeout(() => {
-      if (this.bots.length === 0) {
-        Log.alert("no bots connected - won't start the game!");
-        clearInterval(this.tickInterval);
-        return;
-      }
-      console.log('generating start message');
-      const gameStartMessage = this.generateStartMessage();
-      console.log(`sending start message to ${this.bots.length} bots`);
-      this.bots.map(bot => bot.sendMessage(gameStartMessage));
-    }, GAME_START_DELAY);
+    Log.debug(`this.bots - start(): ${this.bots}`);
+    setTimeout(() => this.dispatchMap(), MAP_DELAY);
+    setTimeout(() => this.dispatchGameStart(), GAME_START_DELAY);
+  }
+
+  dispatchMap() {
+    if (this.bots.length === 0) {
+      console.log("no bots connected - won't send the map!");
+      clearInterval(this.tickInterval);
+      return;
+    }
+    console.log('generating map message');
+    const mapMessage = this.generateMapMessage();
+    console.log(`sending map message to ${this.bots.length} bots`);
+    this.bots.map(bot => bot.sendMessage(mapMessage));
+  }
+
+  dispatchGameStart() {
+    if (this.bots.length === 0) {
+      console.log("no bots connected - won't start the game!");
+      clearInterval(this.tickInterval);
+      return;
+    }
+    console.log('generating start message');
+    const gameStartMessage = this.generateStartMessage();
+    console.log(`sending start message to ${this.bots.length} bots`);
+    this.bots.map(bot => bot.sendMessage(gameStartMessage));
   }
 
   end() {
@@ -146,7 +160,9 @@ export default class Pummiralli {
 
   process(event: ClientMessage) {
     const message = event.message;
-    console.log(`processing event received during tick (type: ${message.messageType})`);
+    console.log(
+      `processing event received during tick (type: ${message.messageType})`,
+    );
     switch (message.messageType) {
       case MessageType.Join: {
         const bot = new Bot(message.data.name, event.socket);
@@ -165,9 +181,7 @@ export default class Pummiralli {
           event.socket.write('could not find joined bot!');
           break;
         }
-        bot.handleMove({
-          angle: message.data.angle,
-        });
+        bot.handleMove(message.data.angle, this.map);
         break;
       }
       case MessageType.Stamp: {
@@ -176,7 +190,7 @@ export default class Pummiralli {
           event.socket.write('could not find joined bot!');
           break;
         }
-        bot.handleStamp();
+        bot.handleStamp(this.map);
         break;
       }
     }

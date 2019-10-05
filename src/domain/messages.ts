@@ -87,6 +87,7 @@ export type Message =
   | ErrorMessage
   | JoinMessage
   | MoveMessage
+  | MapMessage
   | GameStartMessage
   | GameEndMessage
   | PlayerPositionsMessage
