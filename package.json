@@ -43,6 +43,7 @@
     "regenerator-runtime": "^0.11.0",
     "shapeshifter": "^5.0.0",
     "ts-jest": "^24.1.0",
-    "typescript": "^3.6.3"
+    "typescript": "^3.6.3",
+    "yarn": "^1.19.0"
   }
 }
