@@ -11,6 +11,7 @@ import Bot from './bot'
 import Position from './position'
 import Map from './map'
 import Log from '../util/log'
+import { Socket, AddressInfo } from 'net'
 
 const MAP_DELAY = 10000
 const GAME_START_DELAY = 20000
@@ -20,7 +21,7 @@ export default class Pummiralli {
   eventsReceived: Array<ClientMessage>
   eventHistory: Array<ClientMessage>
   bots: Array<Bot>
-  tickInterval: any
+  tickInterval: NodeJS.Timeout
   currentGameTick: number
   map: Map
 
@@ -32,13 +33,11 @@ export default class Pummiralli {
     this.map = new Map()
   }
 
-  collectMessage(socket: any, message: Message): void {
-    const client = socket.address()
-    // console.log(
-    //   `received '${message.messageType}' from ${client.address}:${client.port}`
-    // );
+  collectMessage(socket: Socket, message: Message): void {
+    // const clientAddress = socket._socket.address() as AddressInfo
+    const clientInfo = socket.address() as AddressInfo
     Log.news(
-      `received '${message.messageType}' from ${client.address}:${client.port}`,
+      `received '${message.messageType}' from ${clientInfo.address}:${clientInfo.port}`,
     )
     this.eventsReceived.push({
       tick: this.currentGameTick,
@@ -53,7 +52,7 @@ export default class Pummiralli {
     Log.debugBot(bot)
   }
 
-  drop(socket: any): void {
+  drop(socket: Socket): void {
     const botToBeDropped = this.bots.find(b => b.socket === socket)
     if (!botToBeDropped) {
       // console.log("could not find bot to be dropped!");
@@ -100,7 +99,7 @@ export default class Pummiralli {
     }
   }
 
-  start() {
+  start(): void {
     this.tickInterval = setInterval(() => {
       this.tick()
       // console.log(
@@ -117,7 +116,7 @@ export default class Pummiralli {
     setTimeout(() => this.dispatchGameStart(), GAME_START_DELAY)
   }
 
-  dispatchMap() {
+  dispatchMap(): void {
     if (this.bots.length === 0) {
       console.log("no bots connected - won't send the map!")
       clearInterval(this.tickInterval)
@@ -129,7 +128,7 @@ export default class Pummiralli {
     this.bots.map(bot => bot.sendMessage(mapMessage))
   }
 
-  dispatchGameStart() {
+  dispatchGameStart(): void {
     if (this.bots.length === 0) {
       console.log("no bots connected - won't start the game!")
       clearInterval(this.tickInterval)
@@ -141,13 +140,13 @@ export default class Pummiralli {
     this.bots.map(bot => bot.sendMessage(gameStartMessage))
   }
 
-  end() {
+  end(): void {
     clearInterval(this.tickInterval)
     const gameEndMessage = this.generateEndMessage()
     this.bots.map(bot => bot.sendMessage(gameEndMessage))
   }
 
-  processEventsReceivedDuringTick() {
+  processEventsReceivedDuringTick(): void {
     this.eventsReceived.forEach(event => {
       this.process(event)
       this.eventHistory.push(event)
@@ -158,7 +157,7 @@ export default class Pummiralli {
     this.eventsReceived.length = 0
   }
 
-  process(event: ClientMessage) {
+  process(event: ClientMessage): void {
     const message = event.message
     Log.info(
       `processing event received during tick (type: ${message.messageType})`,
@@ -197,7 +196,7 @@ export default class Pummiralli {
     }
   }
 
-  tick() {
+  tick(): void {
     this.processEventsReceivedDuringTick()
     this.currentGameTick++
     const playerPositionsMessage = this.generatePlayerPositionsMessage()

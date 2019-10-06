@@ -1,17 +1,23 @@
 import Pummiralli from './pummiralli'
+import { Socket } from 'net'
+jest.mock('net')
 jest.mock('../util/log') // No unnecessary logging for tests
 
 describe('Pummiralli', () => {
-  const createMockSocket = (): Record<string, Function> => ({
-    address: jest.fn().mockImplementation(() => '::ffff:127.0.0.1:8099'),
-    write: jest.fn(),
-  })
+  const createMockSocket = (): Socket => {
+    const socket = new Socket()
+    socket.address = jest
+      .fn()
+      .mockImplementation(() => ({ address: 'address', port: 'port' }))
+    return socket
+  }
   afterEach(() => {
     jest.clearAllMocks()
   })
   it('collects message correctly', () => {
     const ralli = new Pummiralli()
-    ralli.collectMessage(createMockSocket(), {
+    const mockSocket = createMockSocket()
+    ralli.collectMessage(mockSocket, {
       messageType: 'join',
       data: {
         name: 'test',

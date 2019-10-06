@@ -9,7 +9,10 @@
     "test": "jest",
     "transpile": "tsc",
     "copy-messages": "cp -r src/messages/ .compiled/messages/",
-    "build": "yarn transpile && yarn run copy-messages"
+    "build": "yarn transpile && yarn run copy-messages",
+    "tsc": "tsc",
+    "start:dev": "ts-node-dev --respawn --transpileOnly ./src/server.ts",
+    "start:prod": "tsc && node .compiled/server.js"
   },
   "jest": {
     "roots": [
@@ -22,8 +25,8 @@
   "dependencies": {
     "ajv": "^5.2.3",
     "chalk": "^2.4.2",
-    "json-over-tcp": "^0.3.2",
-    "ramda": "^0.26.1"
+    "ramda": "^0.26.1",
+    "ts-node-dev": "^1.0.0-pre.43"
   },
   "devDependencies": {
     "@types/jest": "^24.0.18",

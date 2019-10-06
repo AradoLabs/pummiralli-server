@@ -23,6 +23,26 @@
       "request": "launch",
       "name": "Launch Bot",
       "program": "${workspaceFolder}/.compiled/example/client.js"
+    },
+    {
+      "name": "Debug server",
+      "type": "node",
+      "request": "launch",
+      "args": ["src/server.ts"],
+      "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
+      "sourceMaps": true,
+      "cwd": "${workspaceRoot}",
+      "protocol": "inspector"
+    },
+    {
+      "name": "Debug example client",
+      "type": "node",
+      "request": "launch",
+      "args": ["src/example/client.ts"],
+      "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
+      "sourceMaps": true,
+      "cwd": "${workspaceRoot}",
+      "protocol": "inspector"
     }
   ]
 }
