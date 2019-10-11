@@ -11,7 +11,7 @@ export default class Bot {
   constructor(name: string, socket: any) {
     this.name = name
     this.socket = socket
-    this.position = new Position(0, 0) // Tää pitäs olla kartan alkupiste a.k.a K-piste
+    this.position = new Position(40, 40) // Tää pitäs olla kartan alkupiste a.k.a K-piste
   }
 
   getCurrentPosition(): PlayerPositionMessageData {

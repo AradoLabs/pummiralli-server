@@ -30,7 +30,17 @@ export default class Pummiralli {
     this.eventHistory = []
     this.bots = []
     this.currentGameTick = 0
-    this.map = new Map()
+    this.map = new Map({
+      width: 500,
+      height: 500,
+      kPoint: new Position(50, 50),
+      goal: new Position(400, 400),
+      checkpoints: [
+        new Position(100, 100),
+        new Position(200, 200),
+        new Position(300, 300),
+      ],
+    })
   }
 
   collectMessage(socket: Socket, message: Message): void {
@@ -68,7 +78,7 @@ export default class Pummiralli {
   generateStartMessage(): GameStartMessage {
     return {
       messageType: MessageType.GameStart,
-      data: { start: new Position(50, 50), goal: new Position(500, 500) },
+      data: { start: new Position(40, 40), goal: new Position(400, 400) },
     }
   }
 
@@ -78,6 +88,8 @@ export default class Pummiralli {
       data: {
         width: this.map.width,
         height: this.map.height,
+        kPoint: this.map.kPoint,
+        goal: this.map.goal,
         checkpoints: this.map.checkpoints,
       },
     }

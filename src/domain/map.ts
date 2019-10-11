@@ -1,21 +1,36 @@
-import Position from './position';
+import Position from './position'
+import { MapMessageData } from './messages'
 
 export default class Map {
-  width: number;
-  height: number;
-  checkpoints: Array<Position>;
+  width: number
+  height: number
+  kPoint: Position
+  goal: Position
+  checkpoints: Array<Position>
+  targets: Array<Position>
 
-  constructor() {
-    this.width = 5000;
-    this.height = 5000;
-    this.checkpoints = [new Position(100, 100), new Position(4200, 2500)];
+  constructor(mapData: MapMessageData) {
+    const { width, height, kPoint, goal, checkpoints } = mapData
+    this.height = height
+    this.width = width
+    this.kPoint = kPoint
+    this.goal = goal
+    this.checkpoints = checkpoints
+    this.targets = [kPoint, ...checkpoints, goal]
+  }
+
+  getNextTarget() {
+    if (this.targets.length > 1) {
+      this.targets.shift()
+    }
+    return this.targets[0]
   }
 
   getSpeedAtPosition(position: Position): number {
-    return 1;
+    return 1
   }
 
   closeEnoughToCheckpoint(position: Position): boolean {
-    return true;
+    return true
   }
 }

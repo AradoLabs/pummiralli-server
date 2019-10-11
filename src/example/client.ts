@@ -1,20 +1,25 @@
 // @flow
 
-import { Socket, AddressInfo, connect } from 'net'
+import { Socket, connect } from 'net'
 import {
   MessageType,
-  Message,
   StampMessage,
   MoveMessage,
+  GameStartMessage,
+  PlayerPositionsMessage,
+  PlayerPositionMessageData,
+  MapMessage,
 } from '../domain/messages'
-import { PlayerPositionMessageData } from '../domain/messages'
+import Map from '../domain/map'
 import Position from '../domain/position'
-import { tryParseObject } from '../util/parser'
+import Log from '../util/log'
+import { tryParseObject as tryParseMessage } from '../util/parser'
 
 const PORT = 8099
 let myName = 'test kikkula'
-let current
-let target
+let currentPosition
+let map: Map
+let target: Position
 
 declare let process: {
   argv: Array<string>
@@ -36,11 +41,12 @@ if (process.argv.length > 3) {
 
 const moveMessage = (): MoveMessage => {
   const atan = Math.atan(
-    (target.x - current.x) / Math.sqrt((target.y - current.y) ** 2 + 1e-12),
+    (target.x - currentPosition.x) /
+      Math.sqrt((target.y - currentPosition.y) ** 2 + 1e-12),
   )
   return {
     messageType: 'move',
-    data: { angle: target.y - current.y < 0 ? Math.PI - atan : atan },
+    data: { angle: target.y - currentPosition.y < 0 ? Math.PI - atan : atan },
   }
 }
 
@@ -53,17 +59,17 @@ const pummiMessage = (): MoveMessage => {
 }
 
 const stampMessage = (): StampMessage => {
-  console.log('I send: a stamp. ')
-  // TODO: Send correct position
   return {
     messageType: 'stamp',
     data: {
-      position: new Position(0, 0),
+      position: currentPosition,
     },
   }
 }
 
-const myPosition = (playerPositions: Array<PlayerPositionMessageData>) => {
+const myPosition = (
+  playerPositions: Array<PlayerPositionMessageData>,
+): Position => {
   const playerInfo = playerPositions.find(player => myName === player.name)
   if (playerInfo && playerInfo.position) {
     return playerInfo.position
@@ -82,38 +88,70 @@ const createConnection = (): void => {
     'localhost',
     () => {
       // Send the initial message once connected
-      console.log(`I send: ${JSON.stringify(joinMessage)}`)
+      console.log(`Joining: ${JSON.stringify(joinMessage)}`)
       socket.write(JSON.stringify(joinMessage))
     },
   )
 
+  const handleMapMessage = (socket: Socket, message: MapMessage): void => {
+    Log.info(`Received map: ${JSON.stringify(message.data)}`)
+    map = new Map(message.data)
+    target = message.data.kPoint
+  }
+
+  const handleStartMessage = (
+    socket: Socket,
+    message: GameStartMessage,
+  ): void => {
+    Log.info('Starting the ralli!')
+    currentPosition = message.data.start
+    const moveMessageJson = JSON.stringify(moveMessage())
+    Log.info(`First move: ${moveMessageJson}`)
+    socket.write(moveMessageJson)
+  }
+
+  const handlePlayerPositionsMessage = (
+    socket: Socket,
+    message: PlayerPositionsMessage,
+  ): void => {
+    currentPosition = myPosition(message.data)
+
+    if (!target) {
+      Log.debug('Client: No target set')
+      return
+    }
+
+    if (Math.random() < pummiRate) {
+      socket.write(JSON.stringify(pummiMessage()))
+      return
+    }
+    if (
+      // Have a discussion with Jarno - or someone who knows goddamn math
+      Math.sqrt(
+        (currentPosition.x - target.x) * (currentPosition.x - target.x) +
+          (currentPosition.y - target.y) * (currentPosition.y - target.y),
+      ) < 5.0
+    ) {
+      const stampMessageJson = JSON.stringify(stampMessage())
+      Log.info(`Stamping: ${stampMessageJson}`)
+      socket.write(stampMessageJson)
+      target = map.getNextTarget()
+      return
+    }
+    // Keep moving if nothing else
+    socket.write(JSON.stringify(moveMessage()))
+  }
+
   socket.on('data', (data: string | Buffer) => {
-    const message = tryParseObject(data) as Message
-    console.log(`server says: ${JSON.stringify(message)}`)
+    const message = tryParseMessage(data)
+    if (message.messageType === MessageType.Map) {
+      handleMapMessage(socket, message)
+    }
     if (message.messageType === MessageType.GameStart) {
-      current = message.data.start
-      target = message.data.goal
-      const moveMessageJson = JSON.stringify(moveMessage())
-      console.log(`I send: ${moveMessageJson}`)
-      socket.write(moveMessageJson)
+      handleStartMessage(socket, message)
     }
     if (message.messageType === MessageType.PlayerPositions) {
-      current = myPosition(message.data)
-      if (target !== undefined) {
-        if (Math.random() < pummiRate) {
-          socket.write(JSON.stringify(pummiMessage()))
-        } else {
-          socket.write(JSON.stringify(moveMessage()))
-          if (
-            Math.sqrt(
-              (current.x - target.x) * (current.x - target.x) +
-                (current.y - target.y) * (current.y - target.y),
-            ) < 5.0
-          ) {
-            socket.write(JSON.stringify(stampMessage()))
-          }
-        }
-      }
+      handlePlayerPositionsMessage(socket, message)
     }
   })
 }

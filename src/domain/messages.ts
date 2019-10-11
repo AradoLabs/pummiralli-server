@@ -38,6 +38,8 @@ export type MoveMessage = {
 export type MapMessageData = {
   width: number
   height: number
+  kPoint: Position
+  goal: Position
   checkpoints: Array<Position>
 }
 
@@ -84,6 +86,10 @@ export type StampMessage = {
   data: StampMessageData
 }
 
+export type InvalidMessage = {
+  messageType: 'invalid'
+}
+
 export type Message =
   | ErrorMessage
   | JoinMessage
@@ -94,6 +100,7 @@ export type Message =
   | PlayerPositionsMessage
   | StampMessage
   | MapMessage
+  | InvalidMessage
 
 export type ClientMessage = {
   tick: number
