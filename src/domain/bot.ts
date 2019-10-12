@@ -1,17 +1,26 @@
+import { Socket } from 'net'
 import { Message, PlayerPositionMessageData } from './messages'
 import Position from './position'
 import Map from './map'
 import Log from '../util/log'
 
+export enum Status {
+  Preparing,
+  Racing,
+  Finished,
+}
+
 export default class Bot {
   name: string
-  socket: any
+  socket: Socket
   position: Position
+  status: Status
 
-  constructor(name: string, socket: any) {
+  constructor(name: string, socket: Socket) {
     this.name = name
     this.socket = socket
     this.position = new Position(40, 40) // Tää pitäs olla kartan alkupiste a.k.a K-piste
+    this.status = Status.Preparing
   }
 
   getCurrentPosition(): PlayerPositionMessageData {
@@ -42,5 +51,15 @@ export default class Bot {
         closeEnoughToCheckpoint ? 'CHECK!' : 'PUMMI'
       }`,
     )
+  }
+  handleFinish(map: Map): void {
+    const { x, y } = this.position
+    const closeEnoughToCheckpoint = map.closeEnoughToCheckpoint(this.position)
+    console.log(
+      `FINISH: '${this.name}' at (${x}, ${y}) -- ${
+        closeEnoughToCheckpoint ? 'CHECK!' : 'PUMMI'
+      }`,
+    )
+    this.status = Status.Finished
   }
 }

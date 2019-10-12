@@ -1,7 +1,9 @@
 import Pummiralli from './domain/pummiralli'
+import { HistoryEvent } from './domain/messages'
 import { createServer, Socket, AddressInfo } from 'net'
 import Log from './util/log'
 import { tryParseObject } from './util/parser'
+import fs from 'fs'
 
 // import Ajv from 'ajv'
 // import schema from './messages/schema.json'
@@ -43,7 +45,30 @@ const clientConnectionHandler = (socket: Socket): void => {
   })
 }
 
+const shutDown = (eventHistory: Array<HistoryEvent>): void => {
+  const resultsDir = './.results'
+
+  if (!fs.existsSync(resultsDir)) {
+    fs.mkdirSync(resultsDir)
+  }
+  const filePath = `${resultsDir}/${new Date().toISOString()}`
+  Log.debug(`Writing race events to file ${filePath}`)
+  fs.writeFile(
+    `${filePath}.json`,
+    JSON.stringify(eventHistory),
+    'utf8',
+    err => {
+      if (err) {
+        Log.error('Error writing results to JSON:')
+        Log.error(err.toString())
+      }
+    },
+  )
+
+  server.close()
+}
+
 // Let's go
 server.listen(PORT)
 server.on('connection', clientConnectionHandler)
-ralli.start()
+ralli.start(shutDown)

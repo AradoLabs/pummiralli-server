@@ -10,6 +10,7 @@ export enum MessageType {
   GameEnd = 'gameEnd',
   PlayerPositions = 'playerPositions',
   Stamp = 'stamp',
+  Finish = 'finish',
 }
 
 export type ErrorMessage = {
@@ -77,13 +78,18 @@ export type PlayerPositionsMessage = {
   data: Array<PlayerPositionMessageData>
 }
 
-export type StampMessageData = {
+export type PositionData = {
   position: Position
 }
 
 export type StampMessage = {
   messageType: 'stamp'
-  data: StampMessageData
+  data: PositionData
+}
+
+export type FinishMessage = {
+  messageType: 'finish'
+  data: PositionData
 }
 
 export type InvalidMessage = {
@@ -99,6 +105,7 @@ export type Message =
   | GameEndMessage
   | PlayerPositionsMessage
   | StampMessage
+  | FinishMessage
   | MapMessage
   | InvalidMessage
 
@@ -106,4 +113,9 @@ export type ClientMessage = {
   tick: number
   message: Message
   socket: Socket
+}
+
+export type HistoryEvent = {
+  tick: number
+  message: Message
 }

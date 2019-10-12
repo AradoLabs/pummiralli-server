@@ -5,21 +5,24 @@ import {
   GameEndMessage,
   PlayerPositionsMessage,
   ClientMessage,
+  HistoryEvent,
 } from './messages'
 import { MessageType } from './messages'
-import Bot from './bot'
+import Bot, { Status } from './bot'
 import Position from './position'
 import Map from './map'
 import Log from '../util/log'
 import { Socket, AddressInfo } from 'net'
+import { omit } from 'ramda'
 
 const MAP_DELAY = 10000
 const GAME_START_DELAY = 20000
 const TICK_INTERVAL = 1000
 
 export default class Pummiralli {
+  shutdownCallback: Function
   eventsReceived: Array<ClientMessage>
-  eventHistory: Array<ClientMessage>
+  eventHistory: Array<HistoryEvent>
   bots: Array<Bot>
   tickInterval: NodeJS.Timeout
   currentGameTick: number
@@ -34,11 +37,11 @@ export default class Pummiralli {
       width: 500,
       height: 500,
       kPoint: new Position(50, 50),
-      goal: new Position(400, 400),
+      goal: new Position(120, 120),
       checkpoints: [
         new Position(100, 100),
-        new Position(200, 200),
-        new Position(300, 300),
+        // new Position(200, 200),
+        // new Position(300, 300),
       ],
     })
   }
@@ -65,12 +68,10 @@ export default class Pummiralli {
   drop(socket: Socket): void {
     const botToBeDropped = this.bots.find(b => b.socket === socket)
     if (!botToBeDropped) {
-      // console.log("could not find bot to be dropped!");
       Log.error('could not find bot to be dropped!')
       return
     }
     this.bots.splice(this.bots.indexOf(botToBeDropped), 1)
-    // console.log(`removed bot`);
     Log.vapor(`removed bot`)
     return
   }
@@ -111,12 +112,10 @@ export default class Pummiralli {
     }
   }
 
-  start(): void {
+  start(shutdownCallback: Function): void {
+    this.shutdownCallback = shutdownCallback
     this.tickInterval = setInterval(() => {
       this.tick()
-      // console.log(
-      //   `tick ${this.currentGameTick} - waiting for ${TICK_INTERVAL}ms`
-      // );
       Log.info(`tick ${this.currentGameTick} - waiting for ${TICK_INTERVAL}ms`)
     }, TICK_INTERVAL)
     Log.success(
@@ -158,10 +157,13 @@ export default class Pummiralli {
     this.bots.map(bot => bot.sendMessage(gameEndMessage))
   }
 
+  asHistoryEvent = (event: ClientMessage): HistoryEvent =>
+    omit(['socket'], event)
+
   processEventsReceivedDuringTick(): void {
     this.eventsReceived.forEach(event => {
       this.process(event)
-      this.eventHistory.push(event)
+      this.eventHistory.push(this.asHistoryEvent(event))
     })
     if (this.eventsReceived.length > 0) {
       console.log(`${this.eventHistory.length} events in history`)
@@ -169,11 +171,21 @@ export default class Pummiralli {
     this.eventsReceived.length = 0
   }
 
+  endRace(): void {
+    for (const bot of this.bots) {
+      this.drop(bot.socket)
+    }
+    this.shutdownCallback(this.eventHistory)
+  }
+
   process(event: ClientMessage): void {
     const message = event.message
     Log.info(
       `processing event received during tick (type: ${message.messageType})`,
     )
+
+    const allBotsFinished = (): boolean =>
+      this.bots.every(bot => bot.status === Status.Finished)
 
     switch (message.messageType) {
       case MessageType.Join: {
@@ -205,6 +217,18 @@ export default class Pummiralli {
         bot.handleStamp(this.map)
         break
       }
+      case MessageType.Finish: {
+        const bot = this.bots.find(b => b.socket === event.socket)
+        if (!bot) {
+          event.socket.write('could not find joined bot!')
+          break
+        }
+        bot.handleFinish(this.map)
+        break
+      }
+    }
+    if (allBotsFinished()) {
+      this.endRace()
     }
   }
 

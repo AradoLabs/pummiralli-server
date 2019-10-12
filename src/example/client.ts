@@ -4,6 +4,7 @@ import { Socket, connect } from 'net'
 import {
   MessageType,
   StampMessage,
+  FinishMessage,
   MoveMessage,
   GameStartMessage,
   PlayerPositionsMessage,
@@ -67,6 +68,15 @@ const stampMessage = (): StampMessage => {
   }
 }
 
+const finishMessage = (): FinishMessage => {
+  return {
+    messageType: 'finish',
+    data: {
+      position: currentPosition,
+    },
+  }
+}
+
 const myPosition = (
   playerPositions: Array<PlayerPositionMessageData>,
 ): Position => {
@@ -110,6 +120,19 @@ const createConnection = (): void => {
     socket.write(moveMessageJson)
   }
 
+  const stamp = (socket: Socket): void => {
+    const stampMessageJson = JSON.stringify(stampMessage())
+    Log.info(`Stamping: ${stampMessageJson}`)
+    socket.write(stampMessageJson)
+    target = map.getNextTarget()
+  }
+
+  const finish = (socket: Socket): void => {
+    const finishMessageJson = JSON.stringify(finishMessage())
+    Log.info(`Finishing: ${finishMessageJson}`)
+    socket.write(finishMessageJson)
+  }
+
   const handlePlayerPositionsMessage = (
     socket: Socket,
     message: PlayerPositionsMessage,
@@ -132,10 +155,11 @@ const createConnection = (): void => {
           (currentPosition.y - target.y) * (currentPosition.y - target.y),
       ) < 5.0
     ) {
-      const stampMessageJson = JSON.stringify(stampMessage())
-      Log.info(`Stamping: ${stampMessageJson}`)
-      socket.write(stampMessageJson)
-      target = map.getNextTarget()
+      if (target === map.goal) {
+        finish(socket)
+        return
+      }
+      stamp(socket)
       return
     }
     // Keep moving if nothing else
