@@ -92,22 +92,25 @@ export type FinishMessage = {
   data: PositionData
 }
 
-export type InvalidMessage = {
-  messageType: 'invalid'
-}
-
-export type Message =
+export type MessageByServer =
   | ErrorMessage
-  | JoinMessage
-  | MoveMessage
   | MapMessage
   | GameStartMessage
   | GameEndMessage
   | PlayerPositionsMessage
+  | JoinMessage
+
+export type MessageByClient =
+  | JoinMessage
+  | MoveMessage
   | StampMessage
   | FinishMessage
-  | MapMessage
-  | InvalidMessage
+
+export type InvalidMessage = {
+  messageType: 'invalid'
+}
+
+export type Message = MessageByServer | MessageByClient | InvalidMessage
 
 export type ClientMessage = {
   tick: number

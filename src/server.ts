@@ -10,11 +10,6 @@ import process from 'process'
 // import { generate } from './util/terrainGenerator'
 // generate(200, 100)
 
-// TODO: Add validation when types somewhat locked
-// import Ajv from 'ajv'
-// import schema from './messages/schema.json'
-// const validateMessage = new Ajv().compile(schema)
-
 const PORT = 8099
 const ralli = new Pummiralli()
 const server = createServer()
@@ -42,15 +37,11 @@ const clientConnectionHandler = (socket: Socket): void => {
   socket.on('error', errorHandler)
   socket.on('data', (data: string | Buffer) => {
     const message = tryParseObject(data)
-    // if (!validateMessage(message)) {
-    //   socket.write(`Invalid message: ${JSON.stringify(validateMessage.errors)}`)
-    //   return
-    // }
     ralli.collectMessage(socket, message)
   })
 }
 
-const shutDown = (eventHistory: Array<HistoryEvent>): void => {
+const shutDown = async (eventHistory: Array<HistoryEvent>): Promise<void> => {
   const resultsDir = './.results'
 
   if (!fs.existsSync(resultsDir)) {
@@ -58,17 +49,29 @@ const shutDown = (eventHistory: Array<HistoryEvent>): void => {
   }
   const filePath = `${resultsDir}/${new Date().toISOString()}`
   Log.debug(`Writing race events to file ${filePath}`)
-  fs.writeFile(
-    `${filePath}.json`,
-    JSON.stringify(eventHistory),
-    'utf8',
-    err => {
-      if (err) {
-        Log.error('Error writing results to JSON:')
-        Log.error(err.toString())
-      }
-    },
-  )
+
+  try {
+    await fs.promises.writeFile(
+      `${filePath}.json`,
+      JSON.stringify(eventHistory),
+      'utf8',
+    )
+  } catch (err) {
+    Log.error('Error writing results to JSON:')
+    Log.error(err.toString())
+  }
+
+  // writeFile(
+  //   `${filePath}.json`,
+  //   JSON.stringify(eventHistory),
+  //   'utf8',
+  //   err => {
+  //     if (err) {
+  //       Log.error('Error writing results to JSON:')
+  //       Log.error(err.toString())
+  //     }
+  //   },
+  // )
 
   server.close()
 }

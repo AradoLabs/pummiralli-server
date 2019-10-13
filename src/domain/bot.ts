@@ -46,7 +46,7 @@ export default class Bot {
   handleStamp(map: Map): void {
     const { x, y } = this.position
     const closeEnoughToCheckpoint = map.closeEnoughToCheckpoint(this.position)
-    console.log(
+    Log.info(
       `STAMP: '${this.name}' at (${x}, ${y}) -- ${
         closeEnoughToCheckpoint ? 'CHECK!' : 'PUMMI'
       }`,
@@ -55,7 +55,7 @@ export default class Bot {
   handleFinish(map: Map): void {
     const { x, y } = this.position
     const closeEnoughToCheckpoint = map.closeEnoughToCheckpoint(this.position)
-    console.log(
+    Log.success(
       `FINISH: '${this.name}' at (${x}, ${y}) -- ${
         closeEnoughToCheckpoint ? 'CHECK!' : 'PUMMI'
       }`,
