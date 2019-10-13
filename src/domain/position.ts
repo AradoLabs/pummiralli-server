@@ -1,3 +1,8 @@
+export type PositionObject = {
+  x: number
+  y: number
+}
+
 export default class Position {
   x: number
   y: number

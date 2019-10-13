@@ -4,7 +4,13 @@ import { createServer, Socket, AddressInfo } from 'net'
 import Log from './util/log'
 import { tryParseObject } from './util/parser'
 import fs from 'fs'
+import process from 'process'
 
+// For testing map generation
+// import { generate } from './util/terrainGenerator'
+// generate(200, 100)
+
+// TODO: Add validation when types somewhat locked
 // import Ajv from 'ajv'
 // import schema from './messages/schema.json'
 // const validateMessage = new Ajv().compile(schema)
@@ -36,7 +42,6 @@ const clientConnectionHandler = (socket: Socket): void => {
   socket.on('error', errorHandler)
   socket.on('data', (data: string | Buffer) => {
     const message = tryParseObject(data)
-    // TODO: Add validation when types somewhat locked
     // if (!validateMessage(message)) {
     //   socket.write(`Invalid message: ${JSON.stringify(validateMessage.errors)}`)
     //   return
@@ -67,6 +72,15 @@ const shutDown = (eventHistory: Array<HistoryEvent>): void => {
 
   server.close()
 }
+
+process.on('uncaughtException', error => {
+  console.log('Uncaught Exception at:', error)
+})
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.log('Unhandled Rejection at:', promise, 'reason:', reason)
+  // Application specific logging, throwing an error, or other logic here
+})
 
 // Let's go
 server.listen(PORT)
