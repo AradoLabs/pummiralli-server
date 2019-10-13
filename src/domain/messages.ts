@@ -1,4 +1,5 @@
-import Position from './position';
+import Position from './position'
+import { Socket } from 'net'
 
 export enum MessageType {
   Error = 'error',
@@ -9,93 +10,115 @@ export enum MessageType {
   GameEnd = 'gameEnd',
   PlayerPositions = 'playerPositions',
   Stamp = 'stamp',
+  Finish = 'finish',
 }
 
 export type ErrorMessage = {
-  messageType: 'error';
-  message: string;
-};
+  messageType: 'error'
+  message: string
+}
 
 export type JoinMessageData = {
-  name: string;
-};
+  name: string
+}
 
 export type JoinMessage = {
-  messageType: 'join';
-  data: JoinMessageData;
-};
+  messageType: 'join'
+  data: JoinMessageData
+}
 
 export type MoveMessageData = {
-  angle: number;
-};
+  angle: number
+}
 
 export type MoveMessage = {
-  messageType: 'move';
-  data: MoveMessageData;
-};
+  messageType: 'move'
+  data: MoveMessageData
+}
 
 export type MapMessageData = {
-  width: number;
-  height: number;
-  checkpoints: Array<Position>;
-};
+  width: number
+  height: number
+  kPoint: Position
+  goal: Position
+  checkpoints: Array<Position>
+}
 
 export type MapMessage = {
-  messageType: 'map';
-  data: MapMessageData;
-};
+  messageType: 'map'
+  data: MapMessageData
+}
 
 export type GameStartMessageData = {
-  start: Position;
-  goal: Position;
-};
+  start: Position
+  goal: Position
+}
 
 export type GameStartMessage = {
-  messageType: 'gameStart';
-  data: GameStartMessageData;
-};
+  messageType: 'gameStart'
+  data: GameStartMessageData
+}
 
 export type GameEndMessageData = {
-  winner: any;
-};
+  winner: any
+}
 
 export type GameEndMessage = {
-  messageType: 'gameEnd';
-  data: GameEndMessageData;
-};
+  messageType: 'gameEnd'
+  data: GameEndMessageData
+}
 
 export type PlayerPositionMessageData = {
-  name: string;
-  position: Position;
-};
+  name: string
+  position: Position
+}
 
 export type PlayerPositionsMessage = {
-  messageType: 'playerPositions';
-  data: Array<PlayerPositionMessageData>;
-};
+  messageType: 'playerPositions'
+  data: Array<PlayerPositionMessageData>
+}
 
-export type StampMessageData = {
-  position: Position;
-};
+export type PositionData = {
+  position: Position
+}
 
 export type StampMessage = {
-  messageType: 'stamp';
-  data: StampMessageData;
-};
+  messageType: 'stamp'
+  data: PositionData
+}
 
-export type Message =
+export type FinishMessage = {
+  messageType: 'finish'
+  data: PositionData
+}
+
+export type MessageByServer =
   | ErrorMessage
-  | JoinMessage
-  | MoveMessage
   | MapMessage
   | GameStartMessage
   | GameEndMessage
   | PlayerPositionsMessage
+  | JoinMessage
+
+export type MessageByClient =
+  | JoinMessage
+  | MoveMessage
   | StampMessage
-  | MapMessage;
+  | FinishMessage
+
+export type InvalidMessage = {
+  messageType: 'invalid'
+}
+
+export type Message = MessageByServer | MessageByClient | InvalidMessage
 
 export type ClientMessage = {
-  tick: number;
-  message: Message;
-  socket: any;
-};
+  tick: number
+  message: Message
+  socket: Socket
+}
+
+export type HistoryEvent = {
+  tick: number
+  message: Message
+}
