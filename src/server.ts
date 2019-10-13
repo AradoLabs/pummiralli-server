@@ -61,18 +61,6 @@ const shutDown = async (eventHistory: Array<HistoryEvent>): Promise<void> => {
     Log.error(err.toString())
   }
 
-  // writeFile(
-  //   `${filePath}.json`,
-  //   JSON.stringify(eventHistory),
-  //   'utf8',
-  //   err => {
-  //     if (err) {
-  //       Log.error('Error writing results to JSON:')
-  //       Log.error(err.toString())
-  //     }
-  //   },
-  // )
-
   server.close()
 }
 
