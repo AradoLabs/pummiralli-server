@@ -19,6 +19,11 @@ const MAP_DELAY = 10000
 const GAME_START_DELAY = 20000
 const TICK_INTERVAL = 1000
 
+enum RalliStatus {
+  Stopped,
+  Running,
+}
+
 export default class Pummiralli {
   shutdownCallback: Function
   eventsReceived: Array<ClientMessage>
@@ -27,6 +32,7 @@ export default class Pummiralli {
   tickInterval: NodeJS.Timeout
   currentGameTick: number
   map: Map
+  ralliStatus: RalliStatus
 
   constructor() {
     this.eventsReceived = []
@@ -44,6 +50,7 @@ export default class Pummiralli {
         // new Position(300, 300),
       ],
     })
+    this.ralliStatus = RalliStatus.Stopped
   }
 
   collectMessage(socket: Socket, message: Message): void {
@@ -149,6 +156,7 @@ export default class Pummiralli {
     const gameStartMessage = this.generateStartMessage()
     console.log(`sending start message to ${this.bots.length} bots`)
     this.bots.map(bot => bot.sendMessage(gameStartMessage))
+    this.ralliStatus = RalliStatus.Running
   }
 
   end(): void {
@@ -200,6 +208,9 @@ export default class Pummiralli {
         break
       }
       case MessageType.Move: {
+        if (this.ralliStatus !== RalliStatus.Running) {
+          break
+        }
         const bot = this.bots.find(b => b.socket === event.socket)
         if (!bot) {
           event.socket.write('could not find joined bot!')
@@ -209,6 +220,9 @@ export default class Pummiralli {
         break
       }
       case MessageType.Stamp: {
+        if (this.ralliStatus !== RalliStatus.Running) {
+          break
+        }
         const bot = this.bots.find(b => b.socket === event.socket)
         if (!bot) {
           event.socket.write('could not find joined bot!')
@@ -224,6 +238,7 @@ export default class Pummiralli {
           break
         }
         bot.handleFinish(this.map)
+        this.ralliStatus !== RalliStatus.Stopped
         break
       }
     }
