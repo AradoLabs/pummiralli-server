@@ -1,10 +1,8 @@
-// @flow
-import jot from "json-over-tcp";
-import Ajv from "ajv";
-import schema from "./messages/schema.json";
-import Pummiralli from "./domain/pummiralli";
-import log from "./util/log";
-require("babel-regenerator-runtime");
+import jot from 'json-over-tcp';
+import Ajv from 'ajv';
+import schema from './messages/schema.json';
+import Pummiralli from './domain/pummiralli';
+import log from './util/log';
 
 const validateMessage = new Ajv().compile(schema);
 const PORT = 8099;
@@ -27,10 +25,10 @@ const errorHandler = error => {
 
 const clientConnectionHandler = socket => {
   let socketAddress;
-  socket.on("timeout", timeoutHandler);
-  socket.on("close", () => connectionClosedHandler(socket));
-  socket.on("error", errorHandler);
-  socket.on("data", async message => {
+  socket.on('timeout', timeoutHandler);
+  socket.on('close', () => connectionClosedHandler(socket));
+  socket.on('error', errorHandler);
+  socket.on('data', async message => {
     // if (!validateMessage(message)) {
     //   socket.write(
     //     `Invalid message: ${JSON.stringify(validateMessage.errors)}`,
@@ -43,6 +41,6 @@ const clientConnectionHandler = socket => {
 
 // Let's go
 const server = jot.createServer({});
-server.on("connection", clientConnectionHandler);
+server.on('connection', clientConnectionHandler);
 server.listen(PORT);
 ralli.start();

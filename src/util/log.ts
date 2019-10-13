@@ -1,10 +1,19 @@
-//flow
-import chalk from "chalk";
-import { Position } from "../domain/messages";
+import chalk from 'chalk';
+import Position from '../domain/position';
+import Bot from '../domain/bot';
+import { dissoc } from 'ramda';
+
 class Log {
-  constructor() {}
   alert(message: string) {
     console.log(chalk.magenta(message));
+  }
+  debug(message: string) {
+    console.log(chalk.bgRedBright.black(message));
+  }
+  debugBot(bot: Bot) {
+    // Socket will create a circular dep here so dropping it
+    const printableBot = dissoc('socket', bot);
+    console.log(chalk.bgRedBright.black(JSON.stringify(printableBot)));
   }
   error(message: string) {
     console.log(chalk.bold.red(message));
@@ -14,7 +23,7 @@ class Log {
   }
   moveMessage(name: string, position: Position) {
     console.log(
-      `Bot '${chalk.green(name)}' moved to (${position.x}, ${position.y})s`
+      `Bot '${chalk.green(name)}' moved to (${position.x}, ${position.y})s`,
     );
   }
   news(message: string) {
