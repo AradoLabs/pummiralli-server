@@ -13,11 +13,10 @@ import Position from './position'
 import Map from './map'
 import Log from '../util/log'
 import { Socket, AddressInfo } from 'net'
-import { omit } from 'ramda'
 
 const MAP_DELAY = 10000
 const GAME_START_DELAY = 20000
-const TICK_INTERVAL = 1000
+const TICK_INTERVAL = 500
 
 enum RalliStatus {
   Stopped,
@@ -165,13 +164,15 @@ export default class Pummiralli {
     this.bots.map(bot => bot.sendMessage(gameEndMessage))
   }
 
-  asHistoryEvent = (event: ClientMessage): HistoryEvent =>
-    omit(['socket'], event)
+  asHistoryEvent = (tick: number, message: Message): HistoryEvent => ({
+    tick,
+    message,
+  })
 
   processEventsReceivedDuringTick(): void {
     this.eventsReceived.forEach(event => {
       this.process(event)
-      this.eventHistory.push(this.asHistoryEvent(event))
+      this.eventHistory.push(this.asHistoryEvent(event.tick, event.message))
     })
     if (this.eventsReceived.length > 0) {
       console.log(`${this.eventHistory.length} events in history`)
@@ -252,5 +253,8 @@ export default class Pummiralli {
     this.currentGameTick++
     const playerPositionsMessage = this.generatePlayerPositionsMessage()
     this.bots.map(bot => bot.sendMessage(playerPositionsMessage))
+    this.eventHistory.push(
+      this.asHistoryEvent(this.currentGameTick, playerPositionsMessage),
+    )
   }
 }

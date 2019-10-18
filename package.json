@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "chalk": "^2.4.2",
+    "fs": "^0.0.1-security",
     "ramda": "^0.26.1",
     "ts-node-dev": "^1.0.0-pre.43"
   },
