@@ -1,4 +1,5 @@
 import { Socket } from 'net'
+import { v4 as uuid } from 'uuid'
 import { Message, PlayerPositionMessageData } from './messages'
 import Position from './position'
 import Map from './map'
@@ -12,6 +13,7 @@ export enum Status {
 
 export default class Bot {
   name: string
+  id: string
   socket: Socket
   position: Position
   angle: number
@@ -19,6 +21,7 @@ export default class Bot {
 
   constructor(name: string, socket: Socket) {
     this.name = name
+    this.id = uuid()
     this.socket = socket
     this.position = new Position(40, 40) // Tää pitäs olla kartan alkupiste a.k.a K-piste
     this.angle = 0
@@ -28,6 +31,7 @@ export default class Bot {
   getCurrentPosition(): PlayerPositionMessageData {
     return {
       name: this.name,
+      id: this.id,
       position: this.position,
     }
   }

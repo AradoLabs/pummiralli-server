@@ -70,6 +70,7 @@ export type GameEndMessage = {
 
 export type PlayerPositionMessageData = {
   name: string
+  id: string
   position: Position
 }
 
