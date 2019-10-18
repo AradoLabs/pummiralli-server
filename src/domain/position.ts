@@ -12,8 +12,8 @@ export default class Position {
     this.y = y
   }
 
-  updatePosition(angle: number, distance: number) {
-    this.x = this.x + Math.sin(angle) * distance
-    this.y = this.y + Math.cos(angle) * distance
+  updatePosition(angle: number, speed: number) {
+    this.x = this.x + Math.sin(angle) * speed
+    this.y = this.y + Math.cos(angle) * speed
   }
 }

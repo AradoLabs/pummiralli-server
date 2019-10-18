@@ -14,12 +14,14 @@ export default class Bot {
   name: string
   socket: Socket
   position: Position
+  angle: number
   status: Status
 
   constructor(name: string, socket: Socket) {
     this.name = name
     this.socket = socket
     this.position = new Position(40, 40) // Tää pitäs olla kartan alkupiste a.k.a K-piste
+    this.angle = 0
     this.status = Status.Preparing
   }
 
@@ -39,6 +41,7 @@ export default class Bot {
   }
 
   handleMove(angle: number, map: Map): void {
+    this.angle = angle
     this.position.updatePosition(angle, map.getSpeedAtPosition(this.position))
     Log.moveMessage(this.name, this.position)
   }
