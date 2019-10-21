@@ -16,7 +16,7 @@ import { Socket, AddressInfo } from 'net'
 
 const MAP_DELAY = 10000
 const GAME_START_DELAY = 20000
-const TICK_INTERVAL = 500
+const TICK_INTERVAL = 300
 
 enum RalliStatus {
   Stopped,
@@ -39,8 +39,8 @@ export default class Pummiralli {
     this.bots = []
     this.currentGameTick = 0
     this.map = new Map({
-      width: 500,
-      height: 500,
+      width: 1024,
+      height: 576,
       kPoint: new Position(50, 50),
       goal: new Position(120, 120),
       checkpoints: [
@@ -143,6 +143,9 @@ export default class Pummiralli {
     const mapMessage = this.generateMapMessage()
     console.log(`sending map message to ${this.bots.length} bots`)
     this.bots.map(bot => bot.sendMessage(mapMessage))
+    this.eventHistory.push(
+      this.asHistoryEvent(this.currentGameTick, mapMessage),
+    )
   }
 
   dispatchGameStart(): void {

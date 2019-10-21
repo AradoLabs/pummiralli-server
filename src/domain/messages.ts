@@ -1,4 +1,4 @@
-import Position from './position'
+import Position, { PositionObject } from './position'
 import { Socket } from 'net'
 
 export enum MessageType {
@@ -71,7 +71,7 @@ export type GameEndMessage = {
 export type PlayerPositionMessageData = {
   name: string
   id: string
-  position: Position
+  position: PositionObject
 }
 
 export type PlayerPositionsMessage = {

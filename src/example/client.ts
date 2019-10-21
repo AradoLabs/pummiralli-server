@@ -15,6 +15,7 @@ import Map from '../domain/map'
 import Position from '../domain/position'
 import Log from '../util/log'
 import { tryParseObject as tryParseMessage } from '../util/parser'
+import { PositionObject } from '../domain/position'
 
 const PORT = 8099
 let myName = 'test kikkula'
@@ -79,7 +80,7 @@ const finishMessage = (): FinishMessage => {
 
 const myPosition = (
   playerPositions: Array<PlayerPositionMessageData>,
-): Position => {
+): PositionObject => {
   const playerInfo = playerPositions.find(player => myName === player.name)
   if (playerInfo && playerInfo.position) {
     return playerInfo.position

@@ -30,9 +30,12 @@ export default class Bot {
 
   getCurrentPosition(): PlayerPositionMessageData {
     return {
-      name: this.name,
       id: this.id,
-      position: this.position,
+      name: this.name,
+      position: {
+        x: this.position.x,
+        y: this.position.y,
+      },
     }
   }
 
@@ -46,6 +49,7 @@ export default class Bot {
 
   handleMove(angle: number, map: Map): void {
     this.angle = angle
+    console.log(this.position.x)
     this.position.updatePosition(angle, map.getSpeedAtPosition(this.position))
     Log.moveMessage(this.name, this.position)
   }
