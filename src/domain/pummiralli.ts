@@ -16,7 +16,7 @@ import { Socket, AddressInfo } from 'net'
 
 const MAP_DELAY = 10000
 const GAME_START_DELAY = 20000
-const TICK_INTERVAL = 300
+const TICK_INTERVAL = 30
 
 enum RalliStatus {
   Stopped,
@@ -42,11 +42,11 @@ export default class Pummiralli {
       width: 1024,
       height: 576,
       kPoint: new Position(50, 50),
-      goal: new Position(120, 120),
+      goal: new Position(700, 470),
       checkpoints: [
         new Position(100, 100),
-        // new Position(200, 200),
-        // new Position(300, 300),
+        new Position(500, 120),
+        new Position(300, 300),
       ],
     })
     this.ralliStatus = RalliStatus.Stopped
