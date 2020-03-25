@@ -5,3 +5,14 @@
 ## Requirements
 
 - nvm (or just use the node version specified in `.nvmrc`)
+
+### Run server
+
+```bash
+yarn start
+```
+
+### Run test client
+```bash
+yarn test-client
+```
