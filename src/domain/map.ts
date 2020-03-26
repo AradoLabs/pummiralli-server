@@ -27,7 +27,7 @@ export default class Map {
   }
 
   getSpeedAtPosition(position: Position): number {
-    return 1
+    return 10
   }
 
   closeEnoughToCheckpoint(position: Position): boolean {
