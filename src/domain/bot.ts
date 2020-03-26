@@ -48,10 +48,21 @@ export default class Bot {
   }
 
   handleMove(angle: number, map: Map): void {
-    this.angle = angle
+    this.angle = this.pummiFactor(angle)
     console.log(this.position.x)
-    this.position.updatePosition(angle, map.getSpeedAtPosition(this.position))
+    this.position.updatePosition(
+      this.angle,
+      map.getSpeedAtPosition(this.position),
+    )
     Log.moveMessage(this.name, this.position)
+  }
+
+  pummiFactor(angle: number): number {
+    // Standard normal distribution with box-muller transform https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
+    let u1 = Math.random()
+    let u2 = Math.random()
+    let z0 = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2)
+    return angle + z0 * (Math.PI / 3)
   }
 
   handleStamp(map: Map): void {

@@ -94,15 +94,11 @@ const joinMessage = {
 }
 
 const createConnection = (): void => {
-  const socket = connect(
-    PORT,
-    'localhost',
-    () => {
-      // Send the initial message once connected
-      console.log(`Joining: ${JSON.stringify(joinMessage)}`)
-      socket.write(JSON.stringify(joinMessage))
-    },
-  )
+  const socket = connect(PORT, 'localhost', () => {
+    // Send the initial message once connected
+    console.log(`Joining: ${JSON.stringify(joinMessage)}`)
+    socket.write(JSON.stringify(joinMessage))
+  })
 
   const handleMapMessage = (socket: Socket, message: MapMessage): void => {
     Log.info(`Received map: ${JSON.stringify(message.data)}`)
@@ -150,10 +146,10 @@ const createConnection = (): void => {
       return
     }
     if (
-      // Have a discussion with Jarno - or someone who knows goddamn math
+      // Could also use norm in math.js: https://mathjs.org/docs/reference/functions/norm.html
       Math.sqrt(
-        (currentPosition.x - target.x) * (currentPosition.x - target.x) +
-          (currentPosition.y - target.y) * (currentPosition.y - target.y),
+        (currentPosition.x - target.x) ** 2 +
+          (currentPosition.y - target.y) ** 2,
       ) < 5.0
     ) {
       if (target === map.goal) {
